@@ -1,0 +1,106 @@
+{% extends 'page_layout.html' %}
+
+{% block title %} Country Detailed View {% endblock %}
+
+{% block header %}
+    
+{{ hdr_txt  }}
+
+<style>
+    table {
+        width:100%;
+        font-size: 12px;
+    }
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 15px;
+        text-align: left;
+    }
+    #t01 tr:nth-child(even) {
+        background-color: #555;
+    }
+    #t01 tr:nth-child(odd) {
+        background-color: #233;
+    }
+    #t01 th {
+        background-color: black;
+        color: white;
+    }
+</style>
+
+<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
+<script>
+
+    var graphs = {{ graphJSON | safe }};
+    Plotly.newPlot('chart',graphs,{});
+
+    function cb(selection){
+        console.log(selection);
+        $.getJSON({
+            url:"/load_immi",
+            data: { 'country': {{country_details.country_id}}, 'immigration': selection},
+            // data: {
+            //     'immigration': document.getElementById("immigration").value
+            //     },
+            success: function (result) {
+                console.log("Data Returned");
+                console.log(result);
+                Plotly.newPlot('chart',result,{});;
+            }
+        });
+    }
+</script>
+
+{% endblock %}
+    
+{% block javascript %} 
+
+<script> 
+{{ script_txt }} 
+</script>   
+
+{% endblock %}
+
+{% block sidebar %} 
+
+
+<body>
+        
+    <h2>{{country_details.country}}</h2>
+
+    <div>
+        <SELECT type="text" id="immigration" class="btn btn-sm btn-dark" onchange="cb(this.value)">
+            <OPTION value="chinese_immigration" selected>Chinese Immigration</option>
+            <OPTION value="us_immigration">US Immigration</option>
+        </SELECT>
+    </div>
+
+    <div id='chart' class='chart'></div>
+    <table id="t01">
+        <tr>
+            <td>BRI Partner</td>
+            <td>{{country_details.bri_partner}}</td>
+        </tr>
+        <tr>
+            <td>Least Developed Country</td>
+            <td>{{country_details.ldc}}</td>
+        </tr>
+        <tr>
+            <td>Landlocked</td>
+            <td>{{country_details.landlocked_dc}}</td>
+        </tr>
+    </table>
+
+</body>
+
+{% endblock %}
+
+{% block map %}
+
+{{ map_div }}
+
+{% endblock %}

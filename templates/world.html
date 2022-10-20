@@ -1,0 +1,77 @@
+{% extends 'page_layout.html' %}
+
+{% block title %} World Comparison {% endblock %}
+
+{% block header %}
+    
+{{ hdr_txt  }}
+
+{% endblock %}
+    
+{% block javascript %} 
+
+<!-- <script type='text/javascript'>
+    var graphs = {{ graphJSON | safe }};
+    Plotly.newPlot('chart',graphs,{});
+</script> -->
+
+<script> 
+{{ script_txt }} 
+</script>   
+
+<script> 
+$(document).ready(function() {
+    $('#table').on('change', function(e) {
+
+        table = document.getElementById("table").value
+
+        // removing all the current dropdown optioning (if any)
+        const myNode = document.getElementById("variable");
+        while (myNode.lastElementChild) {
+            myNode.removeChild(myNode.lastElementChild);
+        }
+
+        if (table == 'chinese_immigration' || table == 'us_immigration') {
+            var values = ['2000', '2005', '2010', '2015', '2020', 'growth', 'average'];
+            for (const val of values) {
+                $('#variable').append($(document.createElement('option')).prop({
+                    value: val,
+                    text: val
+                }))
+            }
+        } 
+
+    })
+});
+</script>
+
+{% endblock %}
+
+{% block sidebar %}
+
+<form method="POST" action="/">
+    <div>
+        <h2>Displaying Details from: {{data.table}}, {{data.choro_var}}</h2>
+        <label>Choose a Choropleth Table </label> 
+        <SELECT type="text" id="table" name="table" class="btn btn-dark">
+            <OPTION value="chinese_immigration">Chinese Immigration</option>
+            <OPTION value="us_immigration">US Immigration</option>
+        </SELECT>
+
+        <label> Choose a Choropleth Variable </label>
+        <SELECT type="text" id="variable" name="choro_var" class="btn btn-dark">
+            <OPTION value="2000">2000</option>
+            <OPTION value="2005">2005</option>
+        </SELECT>
+    </div>
+    <button type="submit" class="btn btn-default">Go</button>
+</form> 
+
+
+{% endblock %}
+
+{% block map %}
+
+{{ map_div }}
+
+{% endblock %}

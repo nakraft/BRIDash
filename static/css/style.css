@@ -1,0 +1,88 @@
+#viewDiv {
+    padding: 0; 
+    margin: 0; 
+    height: 100%; 
+    width: 100%;
+}
+
+html, 
+body {
+    margin: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar {
+    grid-area: sidebar;
+}
+
+.content {
+    grid-area: content;
+}
+
+.header {
+    grid-area: header;
+    align-items: right;
+}
+
+.wrapper {
+    display: grid;
+    grid-gap: 10px;
+    grid-template-columns: 28% auto;
+    grid-template-rows: 72px  auto;
+    grid-template-areas:
+        "header header"
+        "sidebar content";
+    background-color: #fff;
+    color: #444;
+    width: 100%;
+    height: 100%; 
+}
+
+.box {
+    background-color: #9999;
+    color: #fff;
+    border-radius: 5px;
+    padding: 20px;
+    font-size: 150%;
+}
+
+.header {
+    background-color: #999;
+    align-items: center;
+}
+
+.headerButton {
+    background-color : #999; 
+    border-radius: 12px;
+    font-size: 50%;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+select {
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+
+h4 {
+    color : black;
+}
+
+h2 {
+    color : black;
+}
