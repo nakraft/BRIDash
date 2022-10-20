@@ -67,25 +67,27 @@ def data(country):
     # map will contain inner country details (confucious institutes, expenditures, regional data)
     map_div, hdr_txt, script_txt = c_maps.build_layers(df)
 
-    graphJSON = c_maps.build_graphs(df['country_id'].item(), 'chinese_immigration')
+    graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend')
     if graphJSON == None: 
-        print("No data recieved for immigration. Plot a different value.") 
+        print("No data recieved for expenditures. Plot a different value.") 
+
+    expend_titles = c_maps.get_finance_country(country)
 
     # details needed for sidebar to display data chart 
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
-    return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details, graphJSON=graphJSON)
+    return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details, graphJSON=graphJSON, expend_titles=expend_titles)
 
-@app.route('/load_immi', methods=['GET', 'POST'])
-def load_immi_graph(): 
+@app.route('/load_graph', methods=['GET', 'POST'])
+def load_graph(): 
     
-    print(request.args.get('immigration'))
+    print(request.args.get('graph'))
     print(request.args.get('country'))
-    graphic = request.args.get('immigration')
+    graphic = request.args.get('graph')
     country = request.args.get('country')
     graphJSON = c_maps.build_graphs(country, graphic)
     if graphJSON == None: 
-        print("No data recieved for immigration. Plot a different value.") 
+        print("No data recieved for this graph type. Plot a different value.") 
 
     return graphJSON
 

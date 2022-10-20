@@ -11,6 +11,11 @@
         width:100%;
         font-size: 12px;
     }
+    .expend_chart {
+        width: 100%;
+        height: 400px;
+        overflow: auto;
+    }
     table, th, td {
         border: 1px solid black;
         border-collapse: collapse;
@@ -19,13 +24,13 @@
         padding: 15px;
         text-align: left;
     }
-    #t01 tr:nth-child(even) {
+    table tr:nth-child(even) {
         background-color: #555;
     }
-    #t01 tr:nth-child(odd) {
+    table tr:nth-child(odd) {
         background-color: #233;
     }
-    #t01 th {
+    table th {
         background-color: black;
         color: white;
     }
@@ -34,25 +39,24 @@
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
 
 <script>
-
-    var graphs = {{ graphJSON | safe }};
-    Plotly.newPlot('chart',graphs,{});
-
     function cb(selection){
         console.log(selection);
         $.getJSON({
-            url:"/load_immi",
-            data: { 'country': {{country_details.country_id}}, 'immigration': selection},
-            // data: {
-            //     'immigration': document.getElementById("immigration").value
-            //     },
+            url:"/load_graph",
+            data: { 'country': {{country_details.country_id}}, 'graph': selection},
             success: function (result) {
                 console.log("Data Returned");
                 console.log(result);
-                Plotly.newPlot('chart',result,{});;
+                Plotly.newPlot('chart',result,{});
+
+            },
+            error: function (result) {
+                console.log("No graph available.");
+                document.getElementById("chart").innerHTML = "";
             }
         });
     }
+
 </script>
 
 {% endblock %}
@@ -74,12 +78,14 @@
 
     <div>
         <SELECT type="text" id="immigration" class="btn btn-sm btn-dark" onchange="cb(this.value)">
-            <OPTION value="chinese_immigration" selected>Chinese Immigration</option>
+            <OPTION value="expend" selected>Financial Expenditures</option>
+            <OPTION value="chinese_immigration" >Chinese Immigration</option>
             <OPTION value="us_immigration">US Immigration</option>
         </SELECT>
     </div>
 
     <div id='chart' class='chart'></div>
+
     <table id="t01">
         <tr>
             <td>BRI Partner</td>
@@ -95,7 +101,30 @@
         </tr>
     </table>
 
+    <hr> 
+
+    <h2>Country Level Projects</h2>
+
+    <div class='expend_chart'>
+    <table id='country_level_projects' >
+        {% for name in expend_titles %}
+        <tr>
+            <td> {{ name }}  </td>
+        </tr>
+        {% endfor %}
+          
+    </table>
+    </div>
+
 </body>
+
+<script type="text/javascript">    
+    
+    var graphs = {{ graphJSON | safe }};
+    console.log(graphs)
+    Plotly.newPlot('chart', graphs, {});
+
+</script>
 
 {% endblock %}
 

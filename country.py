@@ -60,11 +60,11 @@ def build_layers(df):
     except Exception:
         print("No data recieved for confucius institutes. Plot a different value.") 
 
-    plot_finance(df['country_id'][0]).add_to(map) 
-    # try: 
-    #     plot_finance(df['country_id'][0]).add_to(map)  
-    # except Exception:
-    #     print("No data recieved for expenditures. Plot a different value.") 
+    try: 
+        plot_finance(df['country_id'][0]).add_to(map)  
+        plot_finance_country(df['country_id'][0])
+    except Exception:
+        print("No data recieved for expenditures. Plot a different value.") 
 
     # map = plot_immigration(country)
 
@@ -75,14 +75,13 @@ def build_layers(df):
 def build_graphs(country_id, type): 
     
     graph = temp_graph.build_graph(country_id, type)
-
     return graph
 
 def plot_finance(country_id): 
 
     expend = folium.FeatureGroup(name='Financial Expenditures')
 
-    # plotting finance is split into three goals 
+    # plotting finance is split into two goals 
     # PART 1: point locations of expenditures 
     df = db.get_expend_data(country_id, 'city')
     print("Country #" + str(country_id) + " financials being loaded." + str(len(df)) + " records found for cities.")
@@ -144,9 +143,16 @@ def plot_finance(country_id):
 
     # market_cluster_expend.add_to(expend)
 
-    # PART 3: country locations of expenditures 
-
     return expend
+
+def get_finance_country(country_id): 
+
+    df = db.get_expend_data(country_id, 'all')
+
+    # get a list of all project titles
+    return df[(pd.isna(df['gl3_id']))]['title']
+
+    # Aggregate country level finances here 
 
 def plot_institutes(country_id, map): 
 

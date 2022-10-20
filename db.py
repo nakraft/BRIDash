@@ -144,11 +144,12 @@ def get_expend_data(country_id, level):
                     ON (cities.id = I.gl3_id) AND (cities.country_id = I.country_id)
                 ''', 
     'region' : '''INNER JOIN regions 
-                    ON (regions.id = I.gl2_id) AND (regions.country_id = I.country_id)
+                    ON (regions.id = I.gl2_id) AND (regions.country_id = I.country_id) AND (I.gl3_id is NULL)
                 ''', 
     'country' : '''INNER JOIN countries
-                    ON cities.country_id = I.country_id
-                '''
+                    ON (cities.country_id = I.country_id) AND (I.gl3_id is NULL) AND (I.gl2_id is NULL)
+                ''', 
+    'all' : ""
     }
 
     sql = 'SELECT * FROM investments AS I ' + innersql[level] + 'WHERE I.country_id = \'' +  str(country_id) + '\'' 
