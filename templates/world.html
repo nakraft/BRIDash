@@ -39,7 +39,16 @@ $(document).ready(function() {
                     text: val
                 }))
             }
-        } 
+        } else if (table == 'pew') {
+            var labels = ['US Holds Economic Power', 'China Holds Economic Power'];
+            var values = ['us_econ_power', 'china_econ_power'];
+            for (let i = 0; i < labels.length; i++) {
+                $('#variable').append($(document.createElement('option')).prop({
+                    value: values[i],
+                    text: labels[i]
+                }))
+            }
+        }
 
     })
 });
@@ -56,12 +65,18 @@ $(document).ready(function() {
         <SELECT type="text" id="table" name="table" class="btn btn-dark">
             <OPTION value="chinese_immigration">Chinese Immigration</option>
             <OPTION value="us_immigration">US Immigration</option>
+            <OPTION value="pew">Public Opinion</option>
         </SELECT>
 
         <label> Choose a Choropleth Variable </label>
         <SELECT type="text" id="variable" name="choro_var" class="btn btn-dark">
             <OPTION value="2000">2000</option>
             <OPTION value="2005">2005</option>
+            <OPTION value="2010">2010</option>
+            <OPTION value="2015">2015</option>
+            <OPTION value="2020">2020</option>
+            <OPTION value="growth">growth</option>
+            <OPTION value="average">average</option>
         </SELECT>
     </div>
     <button type="submit" class="btn btn-default">Go</button>

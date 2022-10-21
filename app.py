@@ -104,3 +104,6 @@ def change_choro():
     print("building choropleth")
 
     return jsonify({'map_div':map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'text':'text'}) # put this into a json and return one obejct
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=3000, debug=True)

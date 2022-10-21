@@ -40,6 +40,8 @@ def get_world_data(table, choro_var, aggregate):
         sql_stm = ""
         if (table == 'us_immigration') or (table == 'chinese_immigration'): 
             sql_stm = 'SELECT country_id, demographic, \"' + choro_var + '\" FROM ' + table + " WHERE demographic = \'all\'"
+        elif table == 'pew': 
+            sql_stm = 'SELECT AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power, country_id FROM pew GROUP BY country_id' 
         df = pd.read_sql(sql_stm, conn)
         print(df.head())
         if aggregate == 'sum': 
@@ -55,6 +57,12 @@ def get_world_data(table, choro_var, aggregate):
     conn.close() 
 
     return countries
+
+def get_public_opinion(table, choro_var, aggregate): 
+
+    conn = get_db_connection_to_df()
+
+
 
 '''
 Collects all data regarding to one country. 

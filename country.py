@@ -62,7 +62,6 @@ def build_layers(df):
 
     try: 
         plot_finance(df['country_id'][0]).add_to(map)  
-        plot_finance_country(df['country_id'][0])
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
 
@@ -111,18 +110,23 @@ def plot_finance(country_id):
     # PART 2: regional locations of expenditures 
     df_r = db.get_expend_data(country_id, 'region')
 
+    dfr_dict = df[['title', 'status']].to_dict('records')
+
     for ele in range(0, len(df_r)):
         geo_j = df_r['geometry'].to_json()
         geo_j = folium.GeoJson(data=geo_j,
                                 style_function=lambda x: {'fillColor': 'red'})
         
-        folium.Popup(
-            f''' 
-            <html>
-            {df_r['title'][ele]}
-            </html> 
-            '''
-        ).add_to(geo_j)
+        print(dfr_dict[ele]['title'])
+        pop = folium.Popup(''' 
+                                <html>
+                                <p>
+                                Project: {title} <br>
+                                Status: {status} <br>
+                                </p>
+                                </html> 
+                                '''.format(**dfr_dict[ele]), min_width=300, max_width=300) # TODO: fix bug here, naming convention of regions doesn't change.
+        pop.add_to(geo_j)
         expend.add_child(geo_j)
 
     # for loc in range(0, len(df_r)):
