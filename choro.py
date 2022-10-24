@@ -49,9 +49,7 @@ def build_choropleth(df, choro_var):
                                             "Least Developed: ", 
                                             "Landlocked: "
                                         ],
-                                        style=("background-color: white; color: #333333; font-family: arial; font-size: 12px; padding: 10px;"))
+                                        style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
     )
 
     return maps.html_json(map)
-
-

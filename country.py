@@ -65,6 +65,11 @@ def build_layers(df):
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
 
+    try: 
+        plot_public_opinions(df['country_id'][0]).add_to(map)  
+    except Exception: 
+        print("No data recieved for public opinions. Plot a different value.") 
+
     # map = plot_immigration(country)
 
     folium.LayerControl(collapsed=True).add_to(map)
@@ -201,3 +206,42 @@ def plot_institutes(country_id, map):
     confucius_institutes.add_to(map)
 
     return map 
+
+def plot_public_opinions(country_id): 
+
+    df = db.get_public_opinion(country_id)
+
+    if len(df) == 0: 
+        raise Exception
+
+    # myscale = (df[choro_var].quantile((0,0.1,0.75,0.9,0.98,1))).tolist()
+    choro = folium.Choropleth(
+        geo_data=df,
+        name='Public Opinion',
+        data=df,
+        columns=['shape_name', 'us_econ_power'],
+        key_on="feature.properties.shape_name",
+        fill_color='YlGnBu',
+        # threshold_scale=myscale,
+        fill_opacity=1,
+        line_opacity=0.2,
+        legend_name='filler', # Make this dynamic based on question
+        smooth_factor=0, 
+        nan_fill_color = '#bababa'
+    )
+
+    choro.geojson.add_child(
+        folium.features.GeoJsonTooltip(fields=[
+                                            'shape_name', 
+                                            'us_econ_power', 
+                                            'china_econ_power'
+                                            ],
+                                        aliases=[
+                                            "Shape Name: ", 
+                                            "US Econ Power: ", 
+                                            "China Econ Power: "
+                                            ],
+                                        style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
+    )
+
+    return choro

@@ -58,11 +58,21 @@ def get_world_data(table, choro_var, aggregate):
 
     return countries
 
-def get_public_opinion(table, choro_var, aggregate): 
+def get_public_opinion(country_id): 
 
     conn = get_db_connection_to_df()
 
+    regions = pd.read_sql(
+                ''' SELECT r.geometry, r.shape_name, AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power
+                FROM adm as r INNER JOIN pew ON (r.shape_name = pew.adm1) AND (r.country_id = pew.country_id)
+                WHERE r.country_id = \'''' + str(country_id) + "\' GROUP BY r.geometry, r.shape_name;", conn)
 
+    regions = turn_geo(regions)
+
+    conn.close() 
+
+    return regions
+    
 
 '''
 Collects all data regarding to one country. 
