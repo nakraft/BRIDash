@@ -7,8 +7,10 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jqueryui.min.css">
+    <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jquery-ui-slider-pips.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css') }}">
-
+  
     <!-- Add a TITLE for each additional page for accessibility -->
     <title>{% block title %} {% endblock %}</title>
 
@@ -18,18 +20,41 @@
   
   <body> 
     <!-- used to create a header, sidebar and main section  -->
-    <div class="wrapper">
-        <nav class="box header navbar navbar-expand-md navbar-light bg-light">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-0" style="border-radius:0px;">
           <a class="navbar-brand" href="{{ url_for('world_comparison')}}"> Chinese Influence Campaigns </a>
-        </nav>
-
-      <div class="box sidebar">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('about_us')}}">About Us</a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Country
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <form class="form-inline">
+                    <input id ="country_search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"> 
+                    <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Find Country</button> -->
+                  </form>
+                </div>
+              </li>
+            </ul>
+          </div>
+      </nav>
+    <div class="wrapper">
+      <div class="box sidebar bg-secondary">
         <!-- use SIDEBAR to specify all comparitive charts, statments, query/export, widgets, etc. -->
         {% block sidebar %} {% endblock %}
       </div>
       <div class="box content" id="official_map">
         <!-- use MAP to program visual map application for dashboard use -->
         {% block map %} {% endblock %}
+      </div>
+      <div class="timebar bg-dark">
+        <div id="flat-slider"></div>
       </div>
     </div>
 
@@ -38,7 +63,57 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
+    <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-ui-slider-pips.js"></script>
+    <script src='../static/js/slider.js'></script>
+    <script> 
+    
+      (function() {
+          var count = document.getElementById('country_search');
+          count.addEventListener('keypress', function(event) {
+              if (event.keyCode == 13) {
+                  event.preventDefault();
+                  if (count.value.length > 0) {
+                      find_country(count.value);
+                  }
+              }
+          });
+      }());
 
+      function find_country(selection){
+          console.log(JSON.stringify(selection))
+          console.log("Finding country " + selection);
+
+          $.ajax({
+              url: "/find_country",
+              type: 'POST',
+              data: JSON.stringify({
+                  "type": "name",
+                  "name": selection,
+              }),
+              contentType: 'application/json', 
+              dataType: 'json',
+              success: function(result) {
+                  console.log("SALKJASDF")
+                  console.log("Details loading for: " + result['country']);
+                  var c = result['country_id'];
+
+                  nextPage(c);
+              },
+              error: function(response) {
+                  console.log(response)
+                  console.log("ERROR");
+              }
+          });
+
+      }
+
+      function nextPage(country_id) {
+              console.log("Loading next page.");
+              window.location.href = '/data/' + country_id;
+      }
+
+    </script>
     <!-- for custom js, use JAVASCRIPT and embedd your own code -->
     {% block javascript %} {% endblock %}
 

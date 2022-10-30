@@ -21,6 +21,7 @@ class LatLngPopup(MacroElement):
                         url: "/find_country",
                         type: 'POST',
                         data: JSON.stringify({
+                            "type": "point",
                             "lat": e.latlng.lat.toFixed(4), 
                             "long": e.latlng.lng.toFixed(4)
                         }),

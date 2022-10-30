@@ -34,6 +34,10 @@ def world_comparison():
 
     return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var}) #known bug here, page reloads after map updated causing dropdowns to be reset
 
+@app.route('/aboutus')
+def about_us():
+    return render_template('about_us.html')
+
 @app.route('/find_country', methods=['GET', 'POST'])
 def find_country(): 
 
@@ -42,18 +46,26 @@ def find_country():
     results = None
 
     # TODO: is this if statement needed? 
-    if request.method == 'POST': 
-        print("location change request ")
+    # if request.method == 'POST': 
+    print("location change request ")
+    df = db.get_world_data(None, None, None)
+    if request.json['type'] == 'point':
         lat = request.json['lat']
         long = request.json['long']
 
-        df = db.get_world_data(None, None, None)
         clicked = Point(float(long), float(lat))
         country = df[df['geometry'].contains(clicked)].reset_index()['country'][0]
-        country_id = df.loc[df['country'] == country, 'country_id'].item()
-        print("name: " + str(country) + " | id: " + str(country_id))
+    elif request.json['type'] == 'name':
+        country = df[df['country'] == request.json['name']].reset_index()['country'][0]
+    else: 
+        raise Exception
 
-        results = {'country': country, 'country_id': country_id}
+    country_id = df.loc[df['country'] == country, 'country_id'].item()
+    print("name: " + str(country) + " | id: " + str(country_id))
+
+    results = {'country': str(country), 'country_id': str(country_id)}
+
+    print(jsonify(results) )
 
     return jsonify(results)    
 
