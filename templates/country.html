@@ -63,6 +63,16 @@
     
 {% block javascript %} 
 
+<script>
+    // establishes generic timeline data 
+    var timeline_details = {
+        'max' : 10,
+        'min' : 0, 
+        'starting_values' : [1,9],
+        'labels' : ["1", "2", "3", "8"]
+    };
+</script>
+<script src='../static/js/slider.js'></script>
 <script> 
 {{ script_txt }} 
 </script>   

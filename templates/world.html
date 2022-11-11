@@ -10,20 +10,24 @@
     
 {% block javascript %} 
 
-<!-- <script type='text/javascript'>
-    var graphs = {{ graphJSON | safe }};
-    Plotly.newPlot('chart',graphs,{});
-</script> -->
-
+<script>
+    // establishes generic timeline data 
+    var timeline_details = {
+        'max' : 10,
+        'min' : 0, 
+        'starting_values' : [1,9],
+        'labels' : ["1", "2", "3", "8"]
+    };
+</script>
+<script src='../static/js/slider.js'></script>
 <script> 
 {{ script_txt }} 
 </script>   
 
-<script> 
-$(document).ready(function() {
-    $('#table').on('change', function(e) {
+<script type="text/javascript"> 
 
-        table = document.getElementById("table").value
+    function change_values(table) {        
+        // table = document.getElementById("table").value
 
         // removing all the current dropdown optioning (if any)
         const myNode = document.getElementById("variable");
@@ -39,6 +43,9 @@ $(document).ready(function() {
                     text: val
                 }))
             }
+
+            document.getElementById("description").innerHTML = "chinese immi description";
+
         } else if (table == 'pew') {
             var labels = ['US Holds Economic Power', 'China Holds Economic Power'];
             var values = ['us_econ_power', 'china_econ_power'];
@@ -48,10 +55,18 @@ $(document).ready(function() {
                     text: labels[i]
                 }))
             }
-        }
 
-    })
-});
+            document.getElementById("description").innerHTML =  "pew description";
+        }
+    }
+        
+    change_values({{data.table|tojson}});
+
+    $(document).ready(function() {
+        $('#table').on('change', function(e) {
+            change_values(document.getElementById("table").value);
+        })
+    });
 </script>
 
 {% endblock %}
@@ -60,7 +75,11 @@ $(document).ready(function() {
 
 <form method="POST" action="/">
     <div>
-        <h2>Displaying Details from: {{data.table}}, {{data.choro_var}}</h2>
+        <h2>Display Details</h2>
+        <hr>
+        <p>Current Selection: {{data.table}} | {{data.choro_var}}</p>
+        <p class="p.shifted" id="description" style="margin-left: 20px;"></p>
+        <hr>
         <label>Choose a Choropleth Table </label> 
         <SELECT type="text" id="table" name="table" class="btn btn-dark">
             <OPTION value="chinese_immigration">Chinese Immigration</option>
@@ -81,7 +100,34 @@ $(document).ready(function() {
     </div>
     <button type="submit" class="btn btn-default">Go</button>
 </form> 
+<br>
+<!-- <form method="POST" action="/query">
+    <div>
+        <h2>Display Details</h2>
+        <hr>
+        <p>Current Selection: {{data.table}} | {{data.choro_var}}</p>
+        <p class="p.shifted" id="description" style="margin-left: 20px;">Immigration records contain data for</p>
+        <hr>
+        <label>Choose a Choropleth Table </label> 
+        <SELECT type="text" id="table" name="table" class="btn btn-dark">
+            <OPTION value="chinese_immigration">Chinese Immigration</option>
+            <OPTION value="us_immigration">US Immigration</option>
+            <OPTION value="pew">Public Opinion</option>
+        </SELECT>
 
+        <label> Choose a Choropleth Variable </label>
+        <SELECT type="text" id="variable" name="choro_var" class="btn btn-dark">
+            <OPTION value="2000">2000</option>
+            <OPTION value="2005">2005</option>
+            <OPTION value="2010">2010</option>
+            <OPTION value="2015">2015</option>
+            <OPTION value="2020">2020</option>
+            <OPTION value="growth">growth</option>
+            <OPTION value="average">average</option>
+        </SELECT>
+    </div>
+    <button type="submit" class="btn btn-default">Go</button>
+</form>  -->
 
 {% endblock %}
 

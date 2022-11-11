@@ -9,11 +9,21 @@ Accesses config file to build a map with the proper specifications.
 Specifications include image size, map center, zoom restrictions, layer settings, 
 map type, etc. 
 '''
-def build_map(location, zoom): 
+def build_map(location, zoom, level): 
 
-    m = folium.Map(location=[location[1], location[0]], zoom_start=zoom, tiles=None) # change to location in config file OR center of displayed borders
+    if level == 'world': 
+        m = folium.Map(location=[location[1], location[0]], tiles=None, 
+                        zoomSnap = .25, zoomDelta = .25, min_zoom = 10, 
+                        max_bounds = True, min_lat= -52, max_lat=80, min_lon= -145, max_lon=170) # change to location in config file OR center of displayed borders
+
+        m.fit_bounds([[-52, -145], [80, 170]])
+    else: 
+        m = folium.Map(location=[location[1], location[0]], tiles=None, 
+                        zoomSnap = .25, zoomDelta = .25, start_zoom = zoom, 
+                        max_bounds = True, min_lat= -52, max_lat=80, min_lon= -145, max_lon=170) # change to location in config file OR center of displayed borders
+
+
     folium.TileLayer('cartodbdark_matter',name="Dark Map",control=False).add_to(m) # change to custom layer settings 
-
     # ensure click gets more details on area
     m.add_child(LatLngPopup.LatLngPopup())
 
@@ -49,3 +59,12 @@ def determine_center(df):
     lng = pd.Series([float(x.x) for x in loc]).mean()
 
     return lng, lat
+
+def determine_bounds(df): 
+    bounds = df.bounds
+    max_lon_south = min(bounds.minx) 
+    max_lon_north = max(bounds.maxx)
+    min_lat_west = min(bounds.miny)
+    max_lat_east = max(bounds.maxy)
+    print([[min_lat_west, max_lon_south], [max_lat_east, max_lon_north]])
+    return [[min_lat_west, max_lon_south], [max_lat_east, max_lon_north]]

@@ -20,29 +20,31 @@
   
   <body> 
     <!-- used to create a header, sidebar and main section  -->
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-0" style="border-radius:0px;">
-          <a class="navbar-brand" href="{{ url_for('world_comparison')}}"> Chinese Influence Campaigns </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav mr-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('about_us')}}">About Us</a>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Country
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                  <form class="form-inline">
-                    <input id ="country_search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"> 
-                    <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Find Country</button> -->
-                  </form>
-                </div>
-              </li>
-            </ul>
-          </div>
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-0">
+        <a class="navbar-brand" href="{{ url_for('world_comparison')}}"> Chinese Influence Campaigns </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav mr-auto dropdown-menu-dark">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('about_us')}}">About Us</a>
+            </li>
+            <li class="nav-item dropdown dropright">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Country
+              </a>
+              <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
+                <form class="form-inline">
+                  <input id ="country_search" class="form-control bg-dark mr-sm-2" type="search" placeholder="Search" aria-label="Search"> 
+                  <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Find Country</button> -->
+                </form>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <a href = https://ncsu-las.org target="_blank"><img src="../static/img/LAS_logo_fullcolor.png" alt="LAS Logo" style="max-height: 72px; align-content: left;"></a>
+
       </nav>
     <div class="wrapper">
       <div class="box sidebar bg-secondary">
@@ -65,7 +67,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
     <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-ui-slider-pips.js"></script>
-    <script src='../static/js/slider.js'></script>
+    <!-- <script src='../static/js/slider.js'></script> -->
     <script> 
     
       (function() {

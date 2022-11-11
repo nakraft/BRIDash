@@ -30,7 +30,7 @@ def world_comparison():
 
     # geodataframe returned of world data aggregated by country
     df = db.get_world_data(table, choro_var, False)
-    map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var)
+    map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var, 'world')
 
     return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var}) #known bug here, page reloads after map updated causing dropdowns to be reset
 
@@ -112,7 +112,7 @@ def change_choro():
     choro_var = request.args.get('choro_var')
 
     df = db.get_world_data(table, choro_var, False)
-    map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var)
+    map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var, 'world')
     print("building choropleth")
 
     return jsonify({'map_div':map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'text':'text'}) # put this into a json and return one obejct

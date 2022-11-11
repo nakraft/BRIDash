@@ -27,7 +27,8 @@ def build_layers(df):
     location = maps.determine_center(df)
 
     # define mapping parameters
-    map = maps.build_map(location, 5)
+    map = maps.build_map(location, 2, 'country')
+    map.fit_bounds(maps.determine_bounds(df))
     # TODO perhaps implement fit_bounds. 
     # Possible by generating a sample of points on the border, extracting sw and ne most points 
     # and then adding that to a bounding box through maps.fit_bounds([sw, ne])

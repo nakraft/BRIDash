@@ -4,33 +4,15 @@ $.extend($.ui.slider.prototype.options, {
 
 $("#flat-slider")
     .slider({
-        max: 10,
-        min: 0,
+        max: timeline_details['max'],
+        min: timeline_details['min'],
         range: true,
-        values: [5, 9],
+        values: timeline_details['starting_values'],
         labels: true
     })
     .slider("pips", {
         first: "label",
         last: "label",
         rest: "label",
-        labels: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+        labels: timeline_details['labels']
     });
-
-// document.getElementById("start-value").innerHTML = $("#flat-slider").slider(
-//     "values"
-// )[0];
-// document.getElementById("end-value").innerHTML = $("#flat-slider").slider(
-//     "values"
-// )[1];
-
-// $("#flat-slider").slider({
-//     change: function (event, ui) {
-//         document.getElementById("start-value").innerHTML = $(
-//             "#flat-slider"
-//         ).slider("values")[0];
-//         document.getElementById("end-value").innerHTML = $(
-//             "#flat-slider"
-//         ).slider("values")[1];
-//     }
-// });

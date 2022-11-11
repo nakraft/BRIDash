@@ -77,10 +77,20 @@ select {
 
 h4 {
     color : black;
+    font-size: 1em;
 }
 
 h2 {
     color : black;
+    font-size: 0.875em;
+}
+
+p {
+    font-size: 0.775em;
+}
+
+p.shifted {
+    margin-left: 20px;
 }
 
 [id*="flat-slider"].ui-slider, [id*="flat-slider"].ui-slider .ui-slider-pip .ui-slider-line {
