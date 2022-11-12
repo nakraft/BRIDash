@@ -3,6 +3,7 @@ Used to build maps of details within a country regarding Chinese Influence.
 Data includes: immigration, financial expenditures, public opinion data. 
 '''
 
+from datetime import date
 import pandas as pd
 import folium
 from folium.plugins import MarkerCluster
@@ -29,9 +30,6 @@ def build_layers(df):
     # define mapping parameters
     map = maps.build_map(location, 2, 'country')
     map.fit_bounds(maps.determine_bounds(df))
-    # TODO perhaps implement fit_bounds. 
-    # Possible by generating a sample of points on the border, extracting sw and ne most points 
-    # and then adding that to a bounding box through maps.fit_bounds([sw, ne])
 
     # puts the country boundary on the map 
     outline = folium.FeatureGroup(name='outline', control=False)
@@ -56,39 +54,48 @@ def build_layers(df):
     outline.add_to(map)
 
     # plot different data layers
+    # make sure these are limited by year 
     try: 
         map = plot_institutes(df['country_id'][0], map)  
     except Exception:
         print("No data recieved for confucius institutes. Plot a different value.") 
 
+    date_range = [2000, 2024]
     try: 
-        plot_finance(df['country_id'][0]).add_to(map)  
+        map, date_range_f = plot_finance(df['country_id'][0], map)
+        if date_range_f != None: 
+            date_range = [min(date_range[0], date_range_f[0]), max(date_range[1], date_range_f[1])]
+            print(date_range)
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
 
     try: 
-        plot_public_opinions(df['country_id'][0]).add_to(map)  
+        map, date_range_p = plot_public_opinions(df['country_id'][0]).add_to(map) 
+        # date_range = [min(date_range[0], date_range_p[0]), max(date_range[1], date_range_p[1])] 
     except Exception: 
         print("No data recieved for public opinions. Plot a different value.") 
 
     # map = plot_immigration(country)
 
     folium.LayerControl(collapsed=True).add_to(map)
+    # [min(date_range_f[0], date_range_p[0]), max(date_range_f[1], date_range_p[1])]
 
-    return maps.html_json(map)
+    return [maps.html_json(map), date_range]
 
 def build_graphs(country_id, type): 
     
     graph = temp_graph.build_graph(country_id, type)
     return graph
 
-def plot_finance(country_id): 
+def plot_finance(country_id, map): 
 
     expend = folium.FeatureGroup(name='Financial Expenditures')
 
     # plotting finance is split into two goals 
     # PART 1: point locations of expenditures 
     df = db.get_expend_data(country_id, 'city')
+    date_range = [min(df['commitment_year']), max(df['commitment_year'])]
+
     print("Country #" + str(country_id) + " financials being loaded." + str(len(df)) + " records found for cities.")
 
     df_dict = df.to_dict('records')
@@ -117,7 +124,6 @@ def plot_finance(country_id):
     df_r = db.get_expend_data(country_id, 'region')
 
     dfr_dict = df[['title', 'status']].to_dict('records')
-
     for ele in range(0, len(df_r)):
         geo_j = df_r['geometry'].to_json()
         geo_j = folium.GeoJson(data=geo_j,
@@ -135,25 +141,9 @@ def plot_finance(country_id):
         pop.add_to(geo_j)
         expend.add_child(geo_j)
 
-    # for loc in range(0, len(df_r)):
-    #     type_color = "red"
-    #     iframe = folium.IFrame(''' 
-    #                             <html>
-    #                             <p>
-    #                             Project: {title} <br>
-    #                             Status: {status} <br>
-    #                             </p>
-    #                             </html> 
-    #                             '''.format(**df_dict[loc]))
-    #     pop = folium.Popup(iframe, min_width=300, max_width=300)
+    expend.add_to(map) 
 
-    #     folium.Marker(location = [df['latitude'][loc], df['longitude'][loc]], # Add in popup 
-    #                     popup = pop,
-    #                     icon = folium.Icon(color = '%s' % type_color)).add_to(market_cluster_expend)
-
-    # market_cluster_expend.add_to(expend)
-
-    return expend
+    return map, date_range
 
 def get_finance_country(country_id): 
 

@@ -30,9 +30,14 @@ def world_comparison():
 
     # geodataframe returned of world data aggregated by country
     df = db.get_world_data(table, choro_var, False)
+    labels = {
+        # 'pew' : df['survey_year'].unique(),
+        'chinese_immigration' : [2000, 2005, 2010, 2015, 2020], 
+        'us_immigration' : [2000, 2005, 2010, 2015, 2020]
+    }
     map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var, 'world')
 
-    return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var}) #known bug here, page reloads after map updated causing dropdowns to be reset
+    return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var, 'timeline': labels[table]}) #known bug here, page reloads after map updated causing dropdowns to be reset
 
 @app.route('/aboutus')
 def about_us():
@@ -74,10 +79,15 @@ def data(country):
 
     print("More details requested for country #" + country)
 
+    # to use if pulling different data of time from backend (PEW only - i)
+    # if request.method == 'POST' : 
+    #     year_start, year_end = request.args.get('filter')
+
     # geodataframe returned of world data aggregated by country
     df = db.get_country(country)
     # map will contain inner country details (confucious institutes, expenditures, regional data)
-    map_div, hdr_txt, script_txt = c_maps.build_layers(df)
+    map_det, date_range = c_maps.build_layers(df)
+    map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
     graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend')
     if graphJSON == None: 
@@ -88,7 +98,8 @@ def data(country):
     # details needed for sidebar to display data chart 
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
-    return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details, graphJSON=graphJSON, expend_titles=expend_titles)
+    return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
+     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(date_range[0], date_range[1] + 1)))
 
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 

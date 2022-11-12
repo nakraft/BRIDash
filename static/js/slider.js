@@ -16,3 +16,11 @@ $("#flat-slider")
         rest: "label",
         labels: timeline_details['labels']
     });
+
+$("#flat-slider").slider({
+    change: function (event, ui) {
+        var start_value = $("#flat-slider").slider("values")[0]; // use start/end value to filter stuff
+        var end_value = $("#flat-slider").slider("values")[1];
+        console.log(start_value, end_value);
+    }
+    });

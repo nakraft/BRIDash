@@ -5,6 +5,44 @@
     width: 100%;
 }
 
+html, 
+body {
+    margin: 0px;
+    width: auto;
+    height: 100%;
+    overflow: hidden;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 28% auto;
+    grid-template-rows: 100px auto 100px;
+    grid-template-areas:
+        "head head"
+        "sidebar content"
+        "sidebar timebar";
+    height: 100%;
+}
+
+.head {
+    grid-area: head;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    padding: 30px;
+}
+
+.timebar {
+    grid-area: timebar;
+    background-color: bg-dark;
+    padding: 30px;
+}
+
+.content {
+    grid-area: content;
+}
+
 .navbar {
     border-radius:0px;
     position: relative;
@@ -14,41 +52,6 @@
 .navbar-nav > li{
     margin-left:15px;
     margin-right:15px;
-  }
-
-/* html, 
-body {
-    margin: 5px;
-    width: 100%;
-    height: 100%;
-} */
-
-.sidebar {
-    grid-area: sidebar;
-    padding: 20px;
-}
-
-.timebar {
-    grid-area: timebar;
-    background-color: bg-dark;
-    padding: 20px;
-}
-
-.content {
-    grid-area: content;
-}
-
-.wrapper {
-    display: grid;
-    grid-template-columns: 28% auto;
-    grid-template-rows: auto 72px;
-    grid-template-areas:
-        "sidebar content"
-        "sidebar timebar";
-    width: 100%;
-    max-width: 100vw;
-    height: 94%; 
-    max-height: 100vh;
 }
 
 .box {

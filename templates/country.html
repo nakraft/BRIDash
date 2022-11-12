@@ -6,38 +6,8 @@
     
 {{ hdr_txt  }}
 
-<style>
-    table {
-        width:100%;
-        font-size: 12px;
-    }
-    .expend_chart {
-        width: 100%;
-        max-height: 50vh;
-        overflow: auto;
-    }
-    table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 15px;
-        text-align: left;
-    }
-    table tr:nth-child(even) {
-        background-color: #555;
-    }
-    table tr:nth-child(odd) {
-        background-color: #233;
-    }
-    table th {
-        background-color: black;
-        color: white;
-    }
-</style>
-
 <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-
+<!-- <script src="../LeafletControlCustom.js"></script> -->
 <script>
     function cb(selection){
         console.log(selection);
@@ -56,7 +26,6 @@
             }
         });
     }
-
 </script>
 
 {% endblock %}
@@ -64,18 +33,21 @@
 {% block javascript %} 
 
 <script>
+    console.log({{timeline[-1]}});
     // establishes generic timeline data 
     var timeline_details = {
-        'max' : 10,
-        'min' : 0, 
-        'starting_values' : [1,9],
-        'labels' : ["1", "2", "3", "8"]
+        'max' : {{timeline[-1]}},
+        'min' : {{timeline[0]}},
+        'starting_values' : [{{ timeline[0] }} , {{timeline[-1]}}],
+        'labels' : {{timeline}}
     };
+
 </script>
+
 <script src='../static/js/slider.js'></script>
 <script> 
 {{ script_txt }} 
-</script>   
+</script>
 
 {% endblock %}
 
@@ -131,7 +103,7 @@
 <script type="text/javascript">    
     
     var graphs = {{ graphJSON | safe }};
-    console.log(graphs)
+    console.log(graphs);
     Plotly.newPlot('chart', graphs, {});
 
 </script>

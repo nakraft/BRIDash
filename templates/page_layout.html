@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jqueryui.min.css">
     <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jquery-ui-slider-pips.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/tables.css') }}">
   
     <!-- Add a TITLE for each additional page for accessibility -->
     <title>{% block title %} {% endblock %}</title>
@@ -19,8 +20,9 @@
   </head>
   
   <body> 
+    <div class="wrapper">
     <!-- used to create a header, sidebar and main section  -->
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-0">
+      <nav class="box head navbar navbar-expand-md navbar-dark bg-dark mb-0">
         <a class="navbar-brand" href="{{ url_for('world_comparison')}}"> Chinese Influence Campaigns </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -28,7 +30,8 @@
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
           <ul class="navbar-nav mr-auto dropdown-menu-dark">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('about_us')}}">About Us</a>
+              <a class="nav-link" href="https://symposium.ncsu-las.net/influence.html#geospatial">About Us</a>
+              <!-- <a class="nav-link" href="{{ url_for('about_us')}}">About Us</a> -->
             </li>
             <li class="nav-item dropdown dropright">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -44,9 +47,8 @@
           </ul>
         </div>
         <a href = https://ncsu-las.org target="_blank"><img src="../static/img/LAS_logo_fullcolor.png" alt="LAS Logo" style="max-height: 72px; align-content: left;"></a>
-
       </nav>
-    <div class="wrapper">
+
       <div class="box sidebar bg-secondary">
         <!-- use SIDEBAR to specify all comparitive charts, statments, query/export, widgets, etc. -->
         {% block sidebar %} {% endblock %}
@@ -55,7 +57,7 @@
         <!-- use MAP to program visual map application for dashboard use -->
         {% block map %} {% endblock %}
       </div>
-      <div class="timebar bg-dark">
+      <div class="box timebar bg-dark">
         <div id="flat-slider"></div>
       </div>
     </div>
@@ -96,7 +98,6 @@
               contentType: 'application/json', 
               dataType: 'json',
               success: function(result) {
-                  console.log("SALKJASDF")
                   console.log("Details loading for: " + result['country']);
                   var c = result['country_id'];
 

@@ -13,7 +13,7 @@ def build_map(location, zoom, level):
 
     if level == 'world': 
         m = folium.Map(location=[location[1], location[0]], tiles=None, 
-                        zoomSnap = .25, zoomDelta = .25, min_zoom = 10, 
+                        zoomSnap = .25, zoomDelta = .25, start_zoom=zoom, 
                         max_bounds = True, min_lat= -52, max_lat=80, min_lon= -145, max_lon=170) # change to location in config file OR center of displayed borders
 
         m.fit_bounds([[-52, -145], [80, 170]])
@@ -21,7 +21,6 @@ def build_map(location, zoom, level):
         m = folium.Map(location=[location[1], location[0]], tiles=None, 
                         zoomSnap = .25, zoomDelta = .25, start_zoom = zoom, 
                         max_bounds = True, min_lat= -52, max_lat=80, min_lon= -145, max_lon=170) # change to location in config file OR center of displayed borders
-
 
     folium.TileLayer('cartodbdark_matter',name="Dark Map",control=False).add_to(m) # change to custom layer settings 
     # ensure click gets more details on area
@@ -66,5 +65,4 @@ def determine_bounds(df):
     max_lon_north = max(bounds.maxx)
     min_lat_west = min(bounds.miny)
     max_lat_east = max(bounds.maxy)
-    print([[min_lat_west, max_lon_south], [max_lat_east, max_lon_north]])
     return [[min_lat_west, max_lon_south], [max_lat_east, max_lon_north]]

@@ -20,7 +20,8 @@ def build_choropleth(df, choro_var, level):
 
     # define mapping parameters
     map = maps.build_map(location, 2, level)
-    
+    # map.fit_bounds([[-52, -145], [80, 170]])
+
     # myscale = (df[choro_var].quantile((0,0.1,0.75,0.9,0.98,1))).tolist()
     choro = folium.Choropleth(
         geo_data=df,
