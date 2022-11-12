@@ -26,6 +26,26 @@
             }
         });
     }
+
+    function newtimerange(start_time, end_time){
+        console.log(start_time, end_time);
+
+        $.ajax({
+            url: "/data/" + window.location.href.split('data/')[1],
+            type: 'POST',
+            data: JSON.stringify({
+                "start": start_time,
+                "end": end_time,
+            }),
+            contentType: 'application/json', 
+            success: function(result, textStatus, jqXHR) {
+                console.log("Details loading for new time range");
+                document.write(result);
+
+            },
+        });
+        
+    }
 </script>
 
 {% endblock %}
@@ -33,18 +53,18 @@
 {% block javascript %} 
 
 <script>
-    console.log({{timeline[-1]}});
+
     // establishes generic timeline data 
     var timeline_details = {
-        'max' : {{timeline[-1]}},
-        'min' : {{timeline[0]}},
-        'starting_values' : [{{ timeline[0] }} , {{timeline[-1]}}],
-        'labels' : {{timeline}}
+        max : {{timeline[-1]}},
+        min : {{timeline[0]}},
+        starting_values : [{{ timeline_start[0]}} , {{timeline_start[1]}}],
+        labels : {{timeline}}
     };
 
 </script>
-
 <script src='../static/js/slider.js'></script>
+
 <script> 
 {{ script_txt }} 
 </script>

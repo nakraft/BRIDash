@@ -19,8 +19,9 @@ Parameters:
 df: geodataframe of country of interest
 Return: html rendering of map
 '''
-def build_layers(df): 
+def build_layers(df, timerange): 
 
+    print("ALKJFSLDJ", timerange)
     country = df['country'].item()
     print("working on " + country)
 
@@ -56,15 +57,16 @@ def build_layers(df):
     # plot different data layers
     # make sure these are limited by year 
     try: 
-        map = plot_institutes(df['country_id'][0], map)  
+        map = plot_institutes(df['country_id'][0], map, timerange)  
     except Exception:
         print("No data recieved for confucius institutes. Plot a different value.") 
 
     date_range = [2000, 2024]
     try: 
-        map, date_range_f = plot_finance(df['country_id'][0], map)
+        map, date_range_f = plot_finance(df['country_id'][0], map, timerange)
+        print("returned")
         if date_range_f != None: 
-            date_range = [min(date_range[0], date_range_f[0]), max(date_range[1], date_range_f[1])]
+            date_range = [int(max(date_range[0], date_range_f[0])), int(min(date_range[1], date_range_f[1]))]
             print(date_range)
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
@@ -87,7 +89,9 @@ def build_graphs(country_id, type):
     graph = temp_graph.build_graph(country_id, type)
     return graph
 
-def plot_finance(country_id, map): 
+def plot_finance(country_id, map, timerange): 
+
+    print("HERE", timerange[0] != None, timerange[1] != None)
 
     expend = folium.FeatureGroup(name='Financial Expenditures')
 
@@ -95,6 +99,9 @@ def plot_finance(country_id, map):
     # PART 1: point locations of expenditures 
     df = db.get_expend_data(country_id, 'city')
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
+    if timerange[0] != None and timerange[1] != None: 
+        df = df.loc[(df['commitment_year'] == None) | (df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0])].reset_index() # & df['commitment_year'] >= timerange[0])
+        print(df.shape)
 
     print("Country #" + str(country_id) + " financials being loaded." + str(len(df)) + " records found for cities.")
 
@@ -109,6 +116,7 @@ def plot_finance(country_id, map):
                                 <p>
                                 Project: {title} <br>
                                 Status: {status} <br>
+                                Year: {commitment_year} <br>
                                 </p>
                                 </html> 
                                 '''.format(**df_dict[loc]))
@@ -122,6 +130,9 @@ def plot_finance(country_id, map):
 
     # PART 2: regional locations of expenditures 
     df_r = db.get_expend_data(country_id, 'region')
+    if timerange[0] != None and timerange[1] != None: 
+        df_r = df_r.loc[(df_r['commitment_year'] == None) | (df_r['commitment_year'] <= timerange[1])].reset_index()
+        print(df_r.shape)
 
     dfr_dict = df[['title', 'status']].to_dict('records')
     for ele in range(0, len(df_r)):
@@ -154,10 +165,11 @@ def get_finance_country(country_id):
 
     # Aggregate country level finances here 
 
-def plot_institutes(country_id, map): 
+def plot_institutes(country_id, map, timerange): 
 
     df = db.get_institutes_data(country_id)
     print("Country #" + str(country_id) + " institutes being loaded.")
+    # df = df[df['date_est'] >= timerange(0) & df['date_est'] <= timerange[1]]
 
     df_dict = df.to_dict('records')
 

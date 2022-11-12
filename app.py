@@ -1,4 +1,5 @@
 import json
+from tracemalloc import start
 from venv import create
 
 from flask import Flask, render_template, request, Markup, jsonify, url_for
@@ -85,8 +86,14 @@ def data(country):
 
     # geodataframe returned of world data aggregated by country
     df = db.get_country(country)
+    start_range, end_range = None, None
+    if request.method == 'POST' : 
+        start_range, end_range = request.json['start'], request.json['end']
+        print("New date range selected", start_range, end_range)
+
+    print(start_range, end_range," AFTERSELECT")
     # map will contain inner country details (confucious institutes, expenditures, regional data)
-    map_det, date_range = c_maps.build_layers(df)
+    map_det, date_range = c_maps.build_layers(df, (start_range, end_range))
     map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
     graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend')
@@ -98,8 +105,14 @@ def data(country):
     # details needed for sidebar to display data chart 
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
+    # if request.method == 'POST': 
+    #     return jsonify({'map_div': map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'country_details': country_details, 'graphJSON': graphJSON, 'expend_titles' : expend_titles}) # put this into a json and return one obejct
+    if start_range == None or end_range == None: 
+        start_range = date_range[0]
+        end_range = date_range[1] + 1
+
     return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
-     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(date_range[0], date_range[1] + 1)))
+     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(date_range[0], date_range[1] + 1)), timeline_start = [start_range, end_range])
 
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 
