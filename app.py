@@ -106,7 +106,7 @@ def data(country):
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
     # if request.method == 'POST': 
-    #     return jsonify({'map_div': map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'country_details': country_details, 'graphJSON': graphJSON, 'expend_titles' : expend_titles}) # put this into a json and return one obejct
+    #     return jsonify({'map_div': map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'expend_titles' : expend_titles}) # put this into a json and return one obejct
 
     return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
      graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(min_range, max_range + 1)), timeline_start = [start_range, end_range])

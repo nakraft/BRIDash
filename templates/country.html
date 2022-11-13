@@ -41,9 +41,10 @@
             success: function(result, textStatus, jqXHR) {
                 console.log("Details loading for new time range");
                 document.write(result);
+                document.close();
+
             },
         });
-        
     }
 </script>
 
@@ -67,6 +68,7 @@
 <script> 
 {{ script_txt }} 
 </script>
+
 
 {% endblock %}
 
