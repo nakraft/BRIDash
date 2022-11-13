@@ -5,7 +5,7 @@ import json
 
 import db
 
-def build_graph(country_id, table): 
+def build_graph(country_id, table, timerange): 
 
     layout = go.Layout(
         paper_bgcolor='#555',
@@ -40,7 +40,7 @@ def build_graph(country_id, table):
     elif table == 'expend': 
 
         print("Getting expenditure data")
-        df = db.get_expend_data(country_id, 'all')
+        df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
 
         amounts = df.groupby('completion_year')['Amount (Nominal)'].sum().reset_index()
         if len(amounts) == 0: 

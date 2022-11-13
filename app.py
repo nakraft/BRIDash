@@ -79,40 +79,37 @@ def find_country():
 def data(country): 
 
     print("More details requested for country #" + country)
-
+    min_range, max_range = db.get_country_timeline(country)
     # to use if pulling different data of time from backend (PEW only - i)
     # if request.method == 'POST' : 
     #     year_start, year_end = request.args.get('filter')
 
     # geodataframe returned of world data aggregated by country
     df = db.get_country(country)
-    start_range, end_range = None, None
     if request.method == 'POST' : 
         start_range, end_range = request.json['start'], request.json['end']
         print("New date range selected", start_range, end_range)
+    else : 
+        start_range, end_range = min_range, max_range
 
-    print(start_range, end_range," AFTERSELECT")
     # map will contain inner country details (confucious institutes, expenditures, regional data)
-    map_det, date_range = c_maps.build_layers(df, [start_range, end_range])
+    map_det = c_maps.build_layers(df, [start_range, end_range])
     map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
-    graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend')
+    graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend', [2000, 2024])
     if graphJSON == None: 
         print("No data recieved for expenditures. Plot a different value.") 
 
-    expend_titles = c_maps.get_finance_country(country)
+    expend_titles = c_maps.get_finance_country(country, [start_range, end_range])
 
     # details needed for sidebar to display data chart 
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
     # if request.method == 'POST': 
     #     return jsonify({'map_div': map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'country_details': country_details, 'graphJSON': graphJSON, 'expend_titles' : expend_titles}) # put this into a json and return one obejct
-    if start_range == None or end_range == None: 
-        start_range = date_range[0]
-        end_range = date_range[1] + 1
 
     return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
-     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(date_range[0], date_range[1] + 1)), timeline_start = [start_range, end_range])
+     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(min_range, max_range + 1)), timeline_start = [start_range, end_range])
 
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 
@@ -121,7 +118,7 @@ def load_graph():
     print(request.args.get('country'))
     graphic = request.args.get('graph')
     country = request.args.get('country')
-    graphJSON = c_maps.build_graphs(country, graphic)
+    graphJSON = c_maps.build_graphs(country, graphic, [2000, 2024])
     if graphJSON == None: 
         print("No data recieved for this graph type. Plot a different value.") 
 

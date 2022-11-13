@@ -97,12 +97,36 @@ def get_country(country_id):
     return countries
 
 '''
+Determines the max time range of data available for a particular country 
+Input: country_id
+Return: a start date and end date for this country denoting the time range of data available 
+'''
+def get_country_timeline(country_id): 
+
+    conn = get_db_connection_to_df()
+
+    p = pd.read_sql(''' SELECT min(survey_year), max(survey_year) FROM pew
+    WHERE country_id = \'''' + str(country_id) + "\';", conn)
+    invest = pd.read_sql(''' SELECT min(commitment_year) as minc, max(commitment_year) as maxc, min(completion_year), max(completion_year) 
+    FROM investments WHERE country_id = \'''' + str(country_id) + "\';", conn)
+    insti = pd.read_sql(''' SELECT EXTRACT(year from min(date_est)) as min, EXTRACT(year from max(date_est)) as max FROM institutes
+    WHERE country_id = \'''' + str(country_id) + "\';", conn)
+
+    # select the min/max total values 
+    minn = min([p['min'][0], invest['minc'][0], invest['min'][0], insti['min'][0]])
+    maxx = max([p['max'][0], invest['maxc'][0], invest['max'][0], insti['max'][0]])
+    print("HERE IS THE MIN, MAX", minn, maxx)
+
+    conn.close()
+    return int(minn), int(maxx)
+
+'''
 Load Confucius Institutes data as merged with cities data to get location elements.
 Data is stored as coordinates and does not need to be converted to geometry's before plotting. 
 Input: country_id to get institutes within
 Return: CI dataframe
 '''
-def get_institutes_data(country_id): 
+def get_institutes_data(country_id, start_time, end_time): 
 
     conn = get_db_connection_to_df()
     df = pd.read_sql(
@@ -112,7 +136,8 @@ def get_institutes_data(country_id):
         cities.latitude, cities.longitude FROM institutes, cities
         WHERE cities.country_id = \'''' + str(country_id) + '''\'
         AND institutes.country_id = \'''' + str(country_id) + '''\'
-        AND cities.id = institutes.gl3_id;
+        AND cities.id = institutes.gl3_id AND CAST(date_est AS DATE) >= \'''' + str(start_time) + '''-01-01\' 
+        AND CAST(date_est AS DATE) <= \'''' + str(end_time) + '''-12-31\';
         ''', conn) 
 
     if df.shape[0] > 0: 
@@ -153,7 +178,7 @@ Input: country_id to get institutes within,
        level to express which (city/region/country) level the data has been stored at
 Return: Immigration dataframe
 '''
-def get_expend_data(country_id, level): 
+def get_expend_data(country_id, level, start_time, end_time): 
 
     conn = get_db_connection_to_df()
     # build SQL statement 
@@ -170,7 +195,8 @@ def get_expend_data(country_id, level):
     'all' : ""
     }
 
-    sql = 'SELECT * FROM investments AS I ' + innersql[level] + 'WHERE I.country_id = \'' +  str(country_id) + '\'' 
+    sql = 'SELECT * FROM investments AS I ' + innersql[level] + 'WHERE I.country_id = \'' +  str(country_id) + '''\'
+    AND commitment_year >= ''' + str(start_time) + ''' AND completion_year <= ''' + str(end_time)
     df = pd.read_sql(sql, conn) 
     print(str(len(df)), level, "records collected")
 

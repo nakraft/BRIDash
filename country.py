@@ -21,7 +21,6 @@ Return: html rendering of map
 '''
 def build_layers(df, timerange): 
 
-    print("ALKJFSLDJ", timerange)
     country = df['country'].item()
     print("working on " + country)
 
@@ -61,18 +60,13 @@ def build_layers(df, timerange):
     except Exception:
         print("No data recieved for confucius institutes. Plot a different value.") 
 
-    date_range = [2000, 2024]
     try: 
-        map, date_range_f = plot_finance(df['country_id'][0], map, timerange)
-        print("returned")
-        if date_range_f != None: 
-            date_range = [int(max(date_range[0], date_range_f[0])), int(min(date_range[1], date_range_f[1]))]
-            print(date_range)
+        map = plot_finance(df['country_id'][0], map, timerange)
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
 
     try: 
-        map, date_range_p = plot_public_opinions(df['country_id'][0]).add_to(map) 
+        map = plot_public_opinions(df['country_id'][0]).add_to(map) 
         # date_range = [min(date_range[0], date_range_p[0]), max(date_range[1], date_range_p[1])] 
     except Exception: 
         print("No data recieved for public opinions. Plot a different value.") 
@@ -82,11 +76,11 @@ def build_layers(df, timerange):
     folium.LayerControl(collapsed=True).add_to(map)
     # [min(date_range_f[0], date_range_p[0]), max(date_range_f[1], date_range_p[1])]
 
-    return [maps.html_json(map), date_range]
+    return maps.html_json(map)
 
-def build_graphs(country_id, type): 
+def build_graphs(country_id, type, timerange): 
     
-    graph = temp_graph.build_graph(country_id, type)
+    graph = temp_graph.build_graph(country_id, type, timerange)
     return graph
 
 def plot_finance(country_id, map, timerange): 
@@ -97,7 +91,7 @@ def plot_finance(country_id, map, timerange):
 
     # plotting finance is split into two goals 
     # PART 1: point locations of expenditures 
-    df = db.get_expend_data(country_id, 'city')
+    df = db.get_expend_data(country_id, 'city', timerange[0], timerange[1])
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
     if timerange[0] != None and timerange[1] != None: 
         df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() # & df['commitment_year'] >= timerange[0])
@@ -129,7 +123,7 @@ def plot_finance(country_id, map, timerange):
     market_cluster_expend.add_to(expend)
 
     # PART 2: regional locations of expenditures 
-    df_r = db.get_expend_data(country_id, 'region')
+    df_r = db.get_expend_data(country_id, 'region', timerange[0], timerange[1])
     if timerange[0] != None and timerange[1] != None: 
         df_r = df_r.loc[(df_r['commitment_year'] == None) | ((df_r['commitment_year'] <= timerange[1]) & (df_r['commitment_year'] >= timerange[0]))].reset_index()
         print(df_r.shape)
@@ -154,11 +148,11 @@ def plot_finance(country_id, map, timerange):
 
     expend.add_to(map) 
 
-    return map, date_range
+    return map
 
-def get_finance_country(country_id): 
+def get_finance_country(country_id, timerange): 
 
-    df = db.get_expend_data(country_id, 'all')
+    df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
 
     # get a list of all project titles
     return df[(pd.isna(df['gl3_id']))]['title']
@@ -167,7 +161,7 @@ def get_finance_country(country_id):
 
 def plot_institutes(country_id, map, timerange): 
 
-    df = db.get_institutes_data(country_id)
+    df = db.get_institutes_data(country_id, timerange[0], timerange[1])
     print("Country #" + str(country_id) + " institutes being loaded.")
     # df = df[df['date_est'] >= timerange(0) & df['date_est'] <= timerange[1]]
 
