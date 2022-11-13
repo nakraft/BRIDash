@@ -100,10 +100,10 @@ def plot_finance(country_id, map, timerange):
     df = db.get_expend_data(country_id, 'city')
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
     if timerange[0] != None and timerange[1] != None: 
-        df = df.loc[(df['commitment_year'] == None) | (df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0])].reset_index() # & df['commitment_year'] >= timerange[0])
+        df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() # & df['commitment_year'] >= timerange[0])
         print(df.shape)
 
-    print("Country #" + str(country_id) + " financials being loaded." + str(len(df)) + " records found for cities.")
+    print("Country #" + str(country_id) + " financials being loaded. " + str(len(df)) + " records found for cities.")
 
     df_dict = df.to_dict('records')
 
@@ -131,7 +131,7 @@ def plot_finance(country_id, map, timerange):
     # PART 2: regional locations of expenditures 
     df_r = db.get_expend_data(country_id, 'region')
     if timerange[0] != None and timerange[1] != None: 
-        df_r = df_r.loc[(df_r['commitment_year'] == None) | (df_r['commitment_year'] <= timerange[1])].reset_index()
+        df_r = df_r.loc[(df_r['commitment_year'] == None) | ((df_r['commitment_year'] <= timerange[1]) & (df_r['commitment_year'] >= timerange[0]))].reset_index()
         print(df_r.shape)
 
     dfr_dict = df[['title', 'status']].to_dict('records')

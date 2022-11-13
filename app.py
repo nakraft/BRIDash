@@ -93,7 +93,7 @@ def data(country):
 
     print(start_range, end_range," AFTERSELECT")
     # map will contain inner country details (confucious institutes, expenditures, regional data)
-    map_det, date_range = c_maps.build_layers(df, (start_range, end_range))
+    map_det, date_range = c_maps.build_layers(df, [start_range, end_range])
     map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
     graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend')
