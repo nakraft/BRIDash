@@ -113,8 +113,8 @@ def get_country_timeline(country_id):
     WHERE country_id = \'''' + str(country_id) + "\';", conn)
 
     # select the min/max total values 
-    minn = min([p['min'][0], invest['minc'][0], invest['min'][0], insti['min'][0]])
-    maxx = max([p['max'][0], invest['maxc'][0], invest['max'][0], insti['max'][0]])
+    minn = min([x if x != None else 2024 for x in [p['min'][0], invest['minc'][0], invest['min'][0], insti['min'][0]]])
+    maxx = max([x if x != None else 2000 for x in [p['max'][0], invest['maxc'][0], invest['max'][0], insti['max'][0]]])
     print("HERE IS THE MIN, MAX", minn, maxx)
 
     conn.close()

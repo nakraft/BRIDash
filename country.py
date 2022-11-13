@@ -66,8 +66,7 @@ def build_layers(df, timerange):
         print("No data recieved for expenditures. Plot a different value.") 
 
     try: 
-        map = plot_public_opinions(df['country_id'][0]).add_to(map) 
-        # date_range = [min(date_range[0], date_range_p[0]), max(date_range[1], date_range_p[1])] 
+        map = plot_public_opinions(df['country_id'][0], map, timerange)
     except Exception: 
         print("No data recieved for public opinions. Plot a different value.") 
 
@@ -204,12 +203,14 @@ def plot_institutes(country_id, map, timerange):
 
     return map 
 
-def plot_public_opinions(country_id): 
+def plot_public_opinions(country_id, map, timerange): 
 
     df = db.get_public_opinion(country_id)
 
     if len(df) == 0: 
         raise Exception
+
+    pew = folium.FeatureGroup(name='Public Opinion')
 
     # myscale = (df[choro_var].quantile((0,0.1,0.75,0.9,0.98,1))).tolist()
     choro = folium.Choropleth(
@@ -241,4 +242,7 @@ def plot_public_opinions(country_id):
                                         style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
     )
 
-    return choro
+    # pew.add_child(choro)
+    choro.add_to(map)
+
+    return map
