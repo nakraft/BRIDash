@@ -58,14 +58,16 @@ def get_world_data(table, choro_var, aggregate):
 
     return countries
 
-def get_public_opinion(country_id): 
+def get_public_opinion(country_id, start_time, end_time): 
 
     conn = get_db_connection_to_df()
 
     regions = pd.read_sql(
-                ''' SELECT r.geometry, r.shape_name, AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power
+                f''' SELECT r.geometry, r.shape_name, AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power, 
+                AVG(fav_china) as fav_china
                 FROM adm as r INNER JOIN pew ON (r.shape_name = pew.adm1) AND (r.country_id = pew.country_id)
-                WHERE r.country_id = \'''' + str(country_id) + "\' GROUP BY r.geometry, r.shape_name;", conn)
+                WHERE r.country_id = \'{country_id}\' AND pew.survey_year >= {start_time}
+                AND pew.survey_year <= {end_time} GROUP BY r.geometry, r.shape_name;''', conn)
 
     regions = turn_geo(regions)
 
@@ -115,7 +117,6 @@ def get_country_timeline(country_id):
     # select the min/max total values 
     minn = min([x if x != None else 2024 for x in [p['min'][0], invest['minc'][0], invest['min'][0], insti['min'][0]]])
     maxx = max([x if x != None else 2000 for x in [p['max'][0], invest['maxc'][0], invest['max'][0], insti['max'][0]]])
-    print("HERE IS THE MIN, MAX", minn, maxx)
 
     conn.close()
     return int(minn), int(maxx)
@@ -220,5 +221,7 @@ def turn_geo(df):
     # add into GeoDataFrame 
     df = gpd.GeoDataFrame(df).reset_index(drop=True)
     df.crs = "epsg:4326"
+
+    df['geometry'] = df['geometry'].simplify(.05)
 
     return df

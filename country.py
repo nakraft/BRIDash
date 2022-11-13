@@ -205,22 +205,48 @@ def plot_institutes(country_id, map, timerange):
 
 def plot_public_opinions(country_id, map, timerange): 
 
-    df = db.get_public_opinion(country_id)
+    df = db.get_public_opinion(country_id, timerange[0], timerange[1])
 
     if len(df) == 0: 
         raise Exception
 
-    pew = folium.FeatureGroup(name='Public Opinion')
-
-    # myscale = (df[choro_var].quantile((0,0.1,0.75,0.9,0.98,1))).tolist()
-    choro = folium.Choropleth(
+    # myscale = (df['china_econ_power'].quantile((0,0.1,0.75,0.9,0.98,1))).tolist()
+    base_choro = folium.Choropleth(
         geo_data=df,
         name='Public Opinion',
         data=df,
         columns=['shape_name', 'us_econ_power'],
         key_on="feature.properties.shape_name",
         fill_color='YlGnBu',
-        # threshold_scale=myscale,
+        fill_opacity=0,
+        line_opacity=.7,
+        line_color = 'white',
+        legend_name='filler', # Make this dynamic based on question
+        smooth_factor=0
+    )
+
+    base_choro.geojson.add_child(
+            folium.features.GeoJsonTooltip(fields=[
+                                                'shape_name', 
+                                                'us_econ_power', 
+                                                'china_econ_power'
+                                                ],
+                                            aliases=[
+                                                "Shape Name: ", 
+                                                "US Econ Power: ", 
+                                                "China Econ Power: "
+                                                ],
+                                            style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
+    )
+
+
+    choro = folium.Choropleth(
+        geo_data=df,
+        name='US Economic Power',
+        data=df,
+        columns=['shape_name', 'us_econ_power'],
+        key_on="feature.properties.shape_name",
+        fill_color='YlGnBu',
         fill_opacity=1,
         line_opacity=0.2,
         legend_name='filler', # Make this dynamic based on question
@@ -228,21 +254,39 @@ def plot_public_opinions(country_id, map, timerange):
         nan_fill_color = '#bababa'
     )
 
-    choro.geojson.add_child(
-        folium.features.GeoJsonTooltip(fields=[
-                                            'shape_name', 
-                                            'us_econ_power', 
-                                            'china_econ_power'
-                                            ],
-                                        aliases=[
-                                            "Shape Name: ", 
-                                            "US Econ Power: ", 
-                                            "China Econ Power: "
-                                            ],
-                                        style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
+    choro2 = folium.Choropleth(
+        geo_data=df,
+        name='China Economic Power',
+        data=df,
+        columns=['shape_name', 'china_econ_power'],
+        key_on="feature.properties.shape_name",
+        fill_color='YlGnBu',
+        fill_opacity=1,
+        line_opacity=0.2,
+        legend_name='filler', # Make this dynamic based on question
+        smooth_factor=0, 
+        nan_fill_color = '#bababa'
     )
 
-    # pew.add_child(choro)
+    choro3 = folium.Choropleth(
+        geo_data=df,
+        name='Favorability Toward China',
+        data=df,
+        columns=['shape_name', 'fav_china'],
+        key_on="feature.properties.shape_name",
+        fill_color='YlGnBu',
+        fill_opacity=1,
+        line_opacity=0.2,
+        legend_name='filler', # Make this dynamic based on question
+        smooth_factor=0, 
+        nan_fill_color = '#bababa'
+    )
+
     choro.add_to(map)
+    choro2.add_to(map)
+    choro3.add_to(map)
+    base_choro.add_to(map)
+
+    #TODO: shift base layer to the last layer and combine statistics there about all datasets 
 
     return map
