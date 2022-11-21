@@ -8,7 +8,7 @@ import pandas as pd
 import geopandas as gpd
 import shapely
 from shapely.geometry import Point
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 '''
 Establishes and returns connection to database. 
@@ -207,6 +207,24 @@ def get_expend_data(country_id, level, start_time, end_time):
         df = turn_geo(df)
 
     return df.reset_index()
+
+'''
+Load Country Financial Expenditure Data total amount
+Input: country_id and timeperiod for which to get sum of expenditures
+Return: total amount of expenditures for a country over a given timeframe
+'''
+def get_dollar_expend(country_id, start_time, end_time): 
+
+    conn = get_db_connection_to_df()
+    # build SQL statement 
+    print('lksdjlfjasdljfljal')
+    val = conn.execute(text(f"SELECT SUM(amount_constant2017) FROM investments WHERE country_id = '{country_id}' AND aggregate = 'true'"))
+    for row in val: 
+        val = row[0]
+    print(val)
+    conn.close() 
+
+    return round(val, 2)
 
 '''
 Convert Polygon or Multipolygon objects back to their geometry. Point data 

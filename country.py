@@ -6,11 +6,14 @@ Data includes: immigration, financial expenditures, public opinion data.
 from datetime import date
 import pandas as pd
 import folium
-from folium.plugins import MarkerCluster
+from folium.plugins import MarkerCluster, BeautifyIcon
+import plotly.graph_objects as go
 
 import maps
 import db
 import temp_graph
+
+import gauge
 
 
 '''
@@ -84,7 +87,7 @@ def build_graphs(country_id, type, timerange):
 
 def plot_finance(country_id, map, timerange): 
 
-    print("HERE", timerange[0] != None, timerange[1] != None)
+    print("Timerange is: ", timerange[0] != None, timerange[1] != None)
 
     expend = folium.FeatureGroup(name='Financial Expenditures')
 
@@ -94,7 +97,6 @@ def plot_finance(country_id, map, timerange):
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
     if timerange[0] != None and timerange[1] != None: 
         df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() # & df['commitment_year'] >= timerange[0])
-        print(df.shape)
 
     print("Country #" + str(country_id) + " financials being loaded. " + str(len(df)) + " records found for cities.")
 
@@ -102,22 +104,50 @@ def plot_finance(country_id, map, timerange):
 
     market_cluster_expend = MarkerCluster(name = "Expend") # no known options for tooltip on cluster, but you can change cluster icon with icon_create_function
 
+    expenditure_key = {
+        'EDUCATION' : '#AF1D1D', 
+        'TRANSPORT AND STORAGE' : '#FBD61D', 
+        'ENERGY' : '#1E9912', 
+        'COMMUNCIATIONS' : '#0356C6', 
+        'INDUSTRY, MINING AND CONSTRUCTION' : '#8519B0', 
+        'HEALTH' : '#DE769A'
+    }
     for loc in range(0, len(df)):
-        type_color = "red"
-        iframe = folium.IFrame(''' 
+        type_color = expenditure_key.get(df_dict[loc]['sector_name'], "#F50404")
+        pop = folium.Popup(''' 
                                 <html>
-                                <p>
-                                Project: {title} <br>
-                                Status: {status} <br>
-                                Year: {commitment_year} <br>
-                                </p>
+                                <table id ="t01" style="background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;">
+                                    <tr> 
+                                        <td> Project </td>
+                                        <td> {title} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Sector </td>
+                                        <td> {sector_name} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Amount 2017 USD </td>
+                                        <td> {amount_constant2017} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Scheduled </td>
+                                        <td> {commitment_year} - {completion_year} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Status </td>
+                                        <td> {status} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Description </td>
+                                        <td> {description} </td>
+                                    </tr>
+                                </table>
                                 </html> 
-                                '''.format(**df_dict[loc]))
-        pop = folium.Popup(iframe, min_width=300, max_width=300)
+                                '''.format(**df_dict[loc]), min_width=300, max_width=700)
 
         folium.Marker(location = [df['latitude'][loc], df['longitude'][loc]], # Add in popup 
                         popup = pop,
-                        icon = folium.Icon(color = '%s' % type_color)).add_to(market_cluster_expend)
+                        icon = BeautifyIcon(border_color = type_color, background_color = type_color)).add_to(market_cluster_expend)
 
     market_cluster_expend.add_to(expend)
 
@@ -127,34 +157,89 @@ def plot_finance(country_id, map, timerange):
         df_r = df_r.loc[(df_r['commitment_year'] == None) | ((df_r['commitment_year'] <= timerange[1]) & (df_r['commitment_year'] >= timerange[0]))].reset_index()
         print(df_r.shape)
 
-    dfr_dict = df[['title', 'status']].to_dict('records')
+    dfr_dict = df[['title', 'status', 'sector_name', 'description', 'commitment_year', 'completion_year', 'amount_constant2017']].to_dict('records')
     for ele in range(0, len(df_r)):
         geo_j = df_r['geometry'].to_json()
         geo_j = folium.GeoJson(data=geo_j,
-                                style_function=lambda x: {'fillColor': 'red'})
+                                style_function=lambda x: {'fillColor': expenditure_key.get(dfr_dict[loc]['sector_name'], "#F50404"), 'color': expenditure_key.get(dfr_dict[loc]['sector_name'], "#F50404")})
         
         print(dfr_dict[ele]['title'])
         pop = folium.Popup(''' 
                                 <html>
-                                <p>
-                                Project: {title} <br>
-                                Status: {status} <br>
-                                </p>
+                                <table id ="t01" style="background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;">
+                                    <tr> 
+                                        <td> Project </td>
+                                        <td> {title} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Sector </td>
+                                        <td> {sector_name} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Amount 2017 USD </td>
+                                        <td> {amount_constant2017} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Scheduled </td>
+                                        <td> {commitment_year} - {completion_year} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Status </td>
+                                        <td> {status} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Description </td>
+                                        <td> {description} </td>
+                                    </tr>
+                                </table>
                                 </html> 
-                                '''.format(**dfr_dict[ele]), min_width=300, max_width=300) # TODO: fix bug here, naming convention of regions doesn't change.
+                                '''.format(**dfr_dict[ele]), min_width=300, max_width=700) # TODO: fix bug here, naming convention of regions doesn't change.
         pop.add_to(geo_j)
         expend.add_child(geo_j)
 
     expend.add_to(map) 
+
+    # build a gauge for comparison of financial expenditures 
+    fig = go.Figure(go.Indicator(
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        value = db.get_dollar_expend(country_id, timerange[0], timerange[1]),
+        mode = "gauge+number",
+        title = {'text': "Financial Expenditures", 'font_color' : 'white', 'font_size' : 40},
+        gauge = {'axis': {'range': [None, 150000000000], 'tickcolor':'red', 'tickfont':{'color':'white', 'size':23}},
+                'steps' : [
+                    {'range': [0, 4584212384], 'color': "red"},
+                    {'range': [4584212384, 150000000000], 'color': "darkred"}],
+                'threshold' : {'line': {'color': "white", 'width': 4}, 'thickness': 0.75, 'value': 4584212384}, 
+                'bar' : {'color':'red'}, 
+                'bordercolor' : 'white', 
+                'shape' : 'angular'},
+        number={'font_color':'white', 'font_size':100}))
+    fig.update_layout({
+        'plot_bgcolor': 'rgba(0,0,0,0)',
+        'paper_bgcolor': 'rgba(0,0,0,0)'
+    })
+
+    fig.write_image("static/img/gauge.png") # TODO: need to pass image directly rather than saving for multi-user use
+
+    map.add_child(gauge.Gauge())
 
     return map
 
 def get_finance_country(country_id, timerange): 
 
     df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
+    df = df.loc[(pd.isna(df['gl3_id'])) & (pd.isna(df['gl2_id']))].reset_index()
 
+    expenditure_key = {
+        'EDUCATION' : '#AF1D1D', 
+        'TRANSPORT AND STORAGE' : '#FBD61D', 
+        'ENERGY' : '#1E9912', 
+        'COMMUNCIATIONS' : '#0356C6', 
+        'INDUSTRY, MINING AND CONSTRUCTION' : '#8519B0', 
+        'HEALTH' : '#DE769A'
+    }
     # get a list of all project titles
-    return df[(pd.isna(df['gl3_id']))]['title']
+    return [(df['title'][x], df['status'][x], df['sector_name'][x], df['description'][x], df['commitment_year'][x], df['completion_year'][x], df['amount_constant2017'][x], expenditure_key.get(df['sector_name'][x], "#F50404")) for x in range(0, len(df))]
 
     # Aggregate country level finances here 
 
@@ -238,6 +323,7 @@ def plot_public_opinions(country_id, map, timerange):
                                                 ],
                                             style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
     )
+    base_choro.add_to(map)
 
 
     choro = folium.Choropleth(
@@ -253,6 +339,7 @@ def plot_public_opinions(country_id, map, timerange):
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
+    choro.add_to(map)
 
     choro2 = folium.Choropleth(
         geo_data=df,
@@ -267,6 +354,7 @@ def plot_public_opinions(country_id, map, timerange):
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
+    choro2.add_to(map)
 
     choro3 = folium.Choropleth(
         geo_data=df,
@@ -281,11 +369,7 @@ def plot_public_opinions(country_id, map, timerange):
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
-
-    choro.add_to(map)
-    choro2.add_to(map)
     choro3.add_to(map)
-    base_choro.add_to(map)
 
     #TODO: shift base layer to the last layer and combine statistics there about all datasets 
 

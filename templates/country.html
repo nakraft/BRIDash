@@ -11,6 +11,7 @@
 <script>
     function cb(selection){
         console.log(selection);
+        // console.log({{country_details.country_id}});
         $.getJSON({
             url:"/load_graph",
             data: { 'country': {{country_details.country_id}}, 'graph': selection},
@@ -18,7 +19,6 @@
                 console.log("Data Returned");
                 console.log(result);
                 Plotly.newPlot('chart',result,{});
-
             },
             error: function (result) {
                 console.log("No graph available.");
@@ -26,6 +26,8 @@
             }
         });
     }
+</script>
+<script>
 
     function newtimerange(start_time, end_time){
         console.log(start_time, end_time);
@@ -111,10 +113,42 @@
     <table id='country_level_projects' >
         {% for name in expend_titles %}
         <tr>
-            <td> {{ name }}  </td>
+            <td style="background-color: {{name[7]}};">.  
+            </td>
+            <td class="CellWithComment"> {{ name[0] }}
+                <span class="CellComment-wrapper">
+                    <span class= "CellComment">
+                        <table style="background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;">
+                            <tr> 
+                                <td> Sector </td>
+                                <td> {{ name[2] }} </td>
+                            </tr>
+                            <tr> 
+                                <td> Amount 2017 USD </td>
+                                <td> {{ name[6] }} </td>
+                            </tr>
+                            <tr> 
+                                <td> Scheduled </td>
+                                <td> {{ name[4] }} - {{ name[5] }} </td>
+                            </tr>
+                            <tr> 
+                                <td> Status </td>
+                                <td> {{ name[1] }} </td>
+                            </tr>
+                            <tr> 
+                                <td> Description </td>
+                                <td> {{ name[3] }} </td>
+                            </tr>
+                        </table>
+                    </span>
+                </span>
+            </td>
         </tr>
         {% endfor %}
-          
+    </table>
+
+    <table> 
+
     </table>
     </div>
 

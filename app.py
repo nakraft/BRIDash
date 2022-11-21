@@ -32,7 +32,7 @@ def world_comparison():
     # geodataframe returned of world data aggregated by country
     df = db.get_world_data(table, choro_var, False)
     labels = {
-        # 'pew' : df['survey_year'].unique(),
+        'pew' : [2017, 2018, 2019, 2020, 2021],
         'chinese_immigration' : [2000, 2005, 2010, 2015, 2020], 
         'us_immigration' : [2000, 2005, 2010, 2015, 2020]
     }
@@ -101,7 +101,6 @@ def data(country):
         print("No data recieved for expenditures. Plot a different value.") 
 
     expend_titles = c_maps.get_finance_country(country, [start_range, end_range])
-
     # details needed for sidebar to display data chart 
     country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
 
@@ -114,6 +113,7 @@ def data(country):
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 
     
+    print("HERE askdjflasdjflaj;sldkjflkasjdl;fj;aslkdjflasjld;fn")
     print(request.args.get('graph'))
     print(request.args.get('country'))
     graphic = request.args.get('graph')

@@ -28,3 +28,46 @@ table th {
     background-color: black;
     color: white;
 }
+
+.CellWithComment{
+    /* position:relative; */
+    display: inline;
+} 
+
+.CellComment-wrapper {
+    position: absolute;
+    visibility: hidden;
+  }
+
+.CellComment
+{
+    display: block;
+    position: relative;
+    width: 500px;
+    max-height: 500px;
+    z-index:70000;
+    color: #FFFFFF;
+    background: #000000;
+    border: 1px solid white;
+    text-align: center;
+    border-radius: 8px;
+    overflow: auto;
+}
+
+.CellComment:after {
+    content: '';
+    position: absolute;
+      bottom: 100%;
+      left: 50%;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    border-bottom: 8px solid #000000;
+    border-right: 8px solid transparent;
+    border-left: 8px solid transparent;
+  }
+
+.CellWithComment:hover .CellComment-wrapper {
+    visibility: visible; 
+    opacity: 1; 
+}
