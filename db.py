@@ -63,11 +63,11 @@ def get_public_opinion(country_id, start_time, end_time):
     conn = get_db_connection_to_df()
     
     regions = pd.read_sql(
-                f''' SELECT r.geometry, r.shape_name, AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power, 
-                AVG(fav_china) as fav_china
+                f''' SELECT r.geometry, r.shape_name, ROUND(AVG(us_econ_power) * 100, 2) AS us_econ_power, ROUND(AVG(china_econ_power) * 100, 2) AS china_econ_power, 
+                ROUND(AVG(fav_china), 2) as fav_china
                 FROM adm as r INNER JOIN pew ON (r.shape_name = pew.adm1) AND (r.country_id = pew.country_id)
                 WHERE r.country_id = \'{country_id}\' AND pew.survey_year >= {start_time}
-                AND pew.survey_year <= {end_time} GROUP BY r.geometry, r.shape_name;''', conn)
+                AND pew.survey_year <= {end_time} AND fav_china < 8 GROUP BY r.geometry, r.shape_name;''', conn)
 
     regions = turn_geo(regions)
 

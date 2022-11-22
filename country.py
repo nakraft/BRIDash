@@ -316,7 +316,7 @@ def plot_public_opinions(country_id, map, timerange):
         key_on="feature.properties.shape_name",
         fill_color='YlGnBu',
         fill_opacity=0,
-        line_opacity=.7,
+        line_opacity=1,
         line_color = 'white',
         legend_name='filler', # Make this dynamic based on question
         smooth_factor=0
@@ -326,17 +326,17 @@ def plot_public_opinions(country_id, map, timerange):
             folium.features.GeoJsonTooltip(fields=[
                                                 'shape_name', 
                                                 'us_econ_power', 
-                                                'china_econ_power'
+                                                'china_econ_power', 
+                                                'fav_china'
                                                 ],
                                             aliases=[
                                                 "Shape Name: ", 
                                                 "US Econ Power: ", 
-                                                "China Econ Power: "
+                                                "China Econ Power: ", 
+                                                "Favor toward China: "
                                                 ],
                                             style=("background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;"))
     )
-    base_choro.add_to(map)
-
 
     choro = folium.Choropleth(
         geo_data=df,
@@ -346,12 +346,20 @@ def plot_public_opinions(country_id, map, timerange):
         key_on="feature.properties.shape_name",
         fill_color='YlGnBu',
         fill_opacity=1,
-        line_opacity=0.2,
+        line_opacity=1,
+        line_color= 'black',
+        overlay=True,
+        show=False,
         legend_name='filler', # Make this dynamic based on question
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
+    for key in choro._children:
+        if key.startswith('color_map'):
+            del(choro._children[key])
     choro.add_to(map)
+
+    # choro.update_layout( showlegend=False)
 
     choro2 = folium.Choropleth(
         geo_data=df,
@@ -361,12 +369,19 @@ def plot_public_opinions(country_id, map, timerange):
         key_on="feature.properties.shape_name",
         fill_color='YlGnBu',
         fill_opacity=1,
-        line_opacity=0.2,
+        line_opacity=1,
+        line_color= 'black',
         legend_name='filler', # Make this dynamic based on question
+        show=False,
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
+    for key in choro2._children:
+        if key.startswith('color_map'):
+            del(choro2._children[key])
     choro2.add_to(map)
+
+
 
     choro3 = folium.Choropleth(
         geo_data=df,
@@ -376,12 +391,23 @@ def plot_public_opinions(country_id, map, timerange):
         key_on="feature.properties.shape_name",
         fill_color='YlGnBu',
         fill_opacity=1,
-        line_opacity=0.2,
+        line_opacity=1,
+        line_color= 'black',
         legend_name='filler', # Make this dynamic based on question
         smooth_factor=0, 
         nan_fill_color = '#bababa'
     )
+    for key in choro3._children:
+        if key.startswith('color_map'):
+            del(choro3._children[key])
     choro3.add_to(map)
+
+    # for key in base_choro._children:
+    #     if key.startswith('color_map'):
+    #         print(base_choro._children[key])
+    #         base_choro._children[key].include(style="fill: rgb(255, 255, 255);")
+
+    base_choro.add_to(map)
 
     #TODO: shift base layer to the last layer and combine statistics there about all datasets 
 
