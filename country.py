@@ -264,21 +264,30 @@ def plot_institutes(country_id, map, timerange):
         type_color = "blue"
 
         # generate the popup 
-        iframe = folium.IFrame(''' 
+        pop = folium.Popup(''' 
                                 <html>
                                 <p>
                                 <a href=\"{ci_webpage}\"> 
-                                {confucius_institute}: 
+                                {confucius_institute}
                                 </a>   
-
                                 <br>
-                                Esablished: {date_est} <br>
-                                Status: {status} <br>
-                                Partner University: {partner_uni} <br>
+                                <table id ="t01" style="background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;">
+                                    <tr> 
+                                        <td> Established </td>
+                                        <td> {date_est}  </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Status </td>
+                                        <td> {status} </td>
+                                    </tr>
+                                    <tr> 
+                                        <td> Partner University </td>
+                                        <td> {partner_uni} </td>
+                                    </tr>
+                                </table>
                                 </p>
                                 </html> 
-                                '''.format(**df_dict[loc]))
-        pop = folium.Popup(iframe, min_width=300, max_width=300)
+                                '''.format(**df_dict[loc]), min_width=300, max_width=300)
 
         # Place the markers with the popup labels and data
         confucius_institutes.add_child(folium.Marker(location = [df['latitude'][loc], df['longitude'][loc]],
@@ -292,8 +301,9 @@ def plot_institutes(country_id, map, timerange):
 
 def plot_public_opinions(country_id, map, timerange): 
 
+    print(timerange)
     df = db.get_public_opinion(country_id, timerange[0], timerange[1])
-
+    print(df)
     if len(df) == 0: 
         raise Exception
 

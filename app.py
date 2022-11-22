@@ -113,7 +113,6 @@ def data(country):
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 
     
-    print("HERE askdjflasdjflaj;sldkjflkasjdl;fj;aslkdjflasjld;fn")
     graphic = request.json['graph']
     country = request.json['country']
     graphJSON = c_maps.build_graphs(country, graphic, [2000, 2024])

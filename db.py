@@ -61,7 +61,7 @@ def get_world_data(table, choro_var, aggregate):
 def get_public_opinion(country_id, start_time, end_time): 
 
     conn = get_db_connection_to_df()
-
+    
     regions = pd.read_sql(
                 f''' SELECT r.geometry, r.shape_name, AVG(us_econ_power) AS us_econ_power, AVG(china_econ_power) AS china_econ_power, 
                 AVG(fav_china) as fav_china
