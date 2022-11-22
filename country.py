@@ -109,6 +109,7 @@ def plot_finance(country_id, map, timerange):
         'TRANSPORT AND STORAGE' : '#FBD61D', 
         'ENERGY' : '#1E9912', 
         'COMMUNCIATIONS' : '#0356C6', 
+        'COMMUNICATIONS' : '#0356C6', 
         'INDUSTRY, MINING AND CONSTRUCTION' : '#8519B0', 
         'HEALTH' : '#DE769A'
     }
@@ -161,9 +162,8 @@ def plot_finance(country_id, map, timerange):
     for ele in range(0, len(df_r)):
         geo_j = df_r['geometry'].to_json()
         geo_j = folium.GeoJson(data=geo_j,
-                                style_function=lambda x: {'fillColor': expenditure_key.get(dfr_dict[loc]['sector_name'], "#F50404"), 'color': expenditure_key.get(dfr_dict[loc]['sector_name'], "#F50404")})
+                                style_function=lambda x: {'fillColor': expenditure_key.get(dfr_dict[ele]['sector_name'].strip(), "#F50404"), 'color': expenditure_key.get(dfr_dict[ele]['sector_name'].strip(), "#F50404")})
         
-        print(dfr_dict[ele]['title'])
         pop = folium.Popup(''' 
                                 <html>
                                 <table id ="t01" style="background-color: white; color: white; font-family: arial; font-size: 12px; padding: 10px;">
@@ -203,15 +203,16 @@ def plot_finance(country_id, map, timerange):
     fig = go.Figure(go.Indicator(
         domain = {'x': [0, 1], 'y': [0, 1]},
         value = db.get_dollar_expend(country_id, timerange[0], timerange[1]),
-        mode = "gauge+number",
+        mode = "gauge+number+delta",
+        delta = {'reference': 4584212384, 'relative': True, 'position' : "bottom"},
         title = {'text': "Financial Expenditures", 'font_color' : 'white', 'font_size' : 40},
-        gauge = {'axis': {'range': [None, 150000000000], 'tickcolor':'red', 'tickfont':{'color':'white', 'size':23}},
+        gauge = {'axis': {'range': [None, 125375455552], 'tickcolor':'red', 'tickfont':{'color':'white', 'size':23}},
                 'steps' : [
                     {'range': [0, 4584212384], 'color': "red"},
-                    {'range': [4584212384, 150000000000], 'color': "darkred"}],
+                    {'range': [4584212384, 125375455552], 'color': "darkred"}],
                 'threshold' : {'line': {'color': "white", 'width': 4}, 'thickness': 0.75, 'value': 4584212384}, 
                 'bar' : {'color':'red'}, 
-                'bordercolor' : 'white', 
+                'bordercolor' : 'white',
                 'shape' : 'angular'},
         number={'font_color':'white', 'font_size':100}))
     fig.update_layout({
@@ -235,6 +236,7 @@ def get_finance_country(country_id, timerange):
         'TRANSPORT AND STORAGE' : '#FBD61D', 
         'ENERGY' : '#1E9912', 
         'COMMUNCIATIONS' : '#0356C6', 
+        'COMMUNICATIONS' : '#0356C6', 
         'INDUSTRY, MINING AND CONSTRUCTION' : '#8519B0', 
         'HEALTH' : '#DE769A'
     }

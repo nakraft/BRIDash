@@ -114,10 +114,8 @@ def data(country):
 def load_graph(): 
     
     print("HERE askdjflasdjflaj;sldkjflkasjdl;fj;aslkdjflasjld;fn")
-    print(request.args.get('graph'))
-    print(request.args.get('country'))
-    graphic = request.args.get('graph')
-    country = request.args.get('country')
+    graphic = request.json['graph']
+    country = request.json['country']
     graphJSON = c_maps.build_graphs(country, graphic, [2000, 2024])
     if graphJSON == None: 
         print("No data recieved for this graph type. Plot a different value.") 

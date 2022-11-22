@@ -217,11 +217,10 @@ def get_dollar_expend(country_id, start_time, end_time):
 
     conn = get_db_connection_to_df()
     # build SQL statement 
-    print('lksdjlfjasdljfljal')
-    val = conn.execute(text(f"SELECT SUM(amount_constant2017) FROM investments WHERE country_id = '{country_id}' AND aggregate = 'true'"))
+    val = conn.execute(text(f'''SELECT SUM(amount_constant2017) FROM investments WHERE country_id = '{country_id}' AND aggregate = 'true'
+                            AND ((commitment_year >= {start_time} OR commitment_year is NULL) AND (completion_year <= {end_time} OR completion_year is NULL)) '''))
     for row in val: 
         val = row[0]
-    print(val)
     conn.close() 
 
     return round(val, 2)

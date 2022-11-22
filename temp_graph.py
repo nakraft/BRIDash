@@ -41,20 +41,33 @@ def build_graph(country_id, table, timerange):
 
         print("Getting expenditure data")
         df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
+        df['color'] = df['sector_name'].map( {'EDUCATION' : '#AF1D1D', 
+                            'TRANSPORT AND STORAGE' : '#FBD61D', 
+                            'ENERGY' : '#1E9912', 
+                            'COMMUNCIATIONS' : '#0356C6', 
+                            'COMMUNICATIONS' : '#0356C6', 
+                            'INDUSTRY, MINING AND CONSTRUCTION' : '#8519B0', 
+                            'HEALTH' : '#DE769A'
+                        })
+        df['color'] = ["#F50404" if pd.isna(x) else x for x in df['color']]
 
-        amounts = df.groupby('completion_year')['Amount (Nominal)'].sum().reset_index()
+        amounts = df.groupby(['completion_year', 'sector_name', 'color'])['amount_constant2017'].sum().reset_index()
         if len(amounts) == 0: 
             return None
 
-        fig.add_trace(
-            go.Bar(
-                x = amounts['completion_year'],
-                y = amounts['Amount (Nominal)']
+        for x in amounts['sector_name'].unique():
+            fig.add_trace(
+                go.Bar(
+                    x = amounts[amounts['sector_name'] == x]['completion_year'],
+                    y = amounts[amounts['sector_name'] == x]['amount_constant2017'], 
+                    name = x, 
+                    marker=dict(color = amounts[amounts['sector_name'] == x]['color'])
+                 )
             )
-        )
 
-        fig.update_xaxes(title_text="Year")
-        fig.update_yaxes(title_text="Total Expenditures")
+        fig.update_layout(
+            barmode="stack", xaxis_title="Year", yaxis_title="Total Expenditures"
+        )
     
     else: 
         print('no other graphs established yet')
