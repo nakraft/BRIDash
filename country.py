@@ -14,6 +14,8 @@ import db
 import temp_graph
 
 import gauge
+import HomeButton
+import query
 
 
 '''
@@ -32,7 +34,8 @@ def build_layers(df, timerange):
 
     # define mapping parameters
     map = maps.build_map(location, 2, 'country')
-    map.fit_bounds(maps.determine_bounds(df))
+    bounds = maps.determine_bounds(df)
+    map.fit_bounds(bounds)
 
     # puts the country boundary on the map 
     outline = folium.FeatureGroup(name='outline', control=False)
@@ -77,6 +80,8 @@ def build_layers(df, timerange):
 
     folium.LayerControl(collapsed=True).add_to(map)
     # [min(date_range_f[0], date_range_p[0]), max(date_range_f[1], date_range_p[1])]
+    map.add_child(HomeButton.HomeButton(bounds))
+    map.add_child(query.Query())
 
     return maps.html_json(map)
 

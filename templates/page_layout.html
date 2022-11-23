@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jquery-ui-slider-pips.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/tables.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
   
     <!-- Add a TITLE for each additional page for accessibility -->
     <title>{% block title %} {% endblock %}</title>
@@ -40,7 +41,6 @@
               <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdownMenuLink">
                 <form class="form-inline">
                   <input id ="country_search" class="form-control bg-dark mr-sm-2" type="search" placeholder="Search" aria-label="Search" style="color: white;"> 
-                  <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Find Country</button> -->
                 </form>
               </div>
             </li>
@@ -69,6 +69,9 @@
       <div class="box content" id="official_map">
         <!-- use MAP to program visual map application for dashboard use -->
         {% block map %} {% endblock %}
+        <div class="button dark">
+          <button>psadflk</button>
+        </div>
       </div>
       <div class="box timebar bg-dark">
         <div id="flat-slider"></div>
@@ -82,7 +85,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-plus-ui.min.js"></script>
     <script src="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/js/jquery-ui-slider-pips.js"></script>
-    <!-- <script src='../static/js/slider.js'></script> -->
     <script> 
     
       (function() {
