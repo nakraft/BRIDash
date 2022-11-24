@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://simeydotme.github.io/jQuery-ui-Slider-Pips/dist/css/jquery-ui-slider-pips.min.css">
     <link rel="stylesheet" href="{{url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/tables.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/leaflet-tag-filter-button.css') }}">
   
     <!-- Add a TITLE for each additional page for accessibility -->
     <title>{% block title %} {% endblock %}</title>
@@ -58,6 +58,69 @@
               </div>
             </li>
           </ul>
+          <ul class="navbar-nav mr-auto dropdown-menu-dark navbar-right" id = 'filtering-capability' style="display : none;">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Query
+              </a>
+              <div class="dropdown-menu bg-secondary" aria-labelledby="navbarDropdownMenuLink" >
+                <form method="POST" action="/filter_data" style="margin-left:15px; margin-right:15px; margin-bottom: 15px;">
+                  <div style = "color: white;">
+                      <h3>Query Your Data:</h3>
+                      <hr>
+                      <label>Keyword Search</label>
+                      <input type="text" id="search-term" name="search-term" placeholder="i.e. school" class="bg-secondary"></input> 
+                      <hr>
+                      <label>Financial Expenditures</label> 
+                      <p>
+                        <SELECT type="text" id="expenditure-type" name="expenditure-type" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Sector Name -- </option>
+                          {% for ele in ["EDUCATION", "COMMUNICATIONS"] %}
+                          <OPTION value="{ele}" style = "color: white;">{{ele}}</option>
+                          {% endfor %} 
+                        </SELECT>
+                      </p>
+                      <p>
+                        <SELECT type="text" id="donor" name="donors" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Donor Agency -- </option>
+                          {% for ele in ["donor1", "donor2"] %}
+                          <OPTION value="{ele}" style = "color: white;">{{ele}}</option>
+                          {% endfor %} 
+                        </SELECT>
+                      </p>
+                      <hr>
+                      <label>Confucius Institutes</label> 
+                      <SELECT type="text" id="ci-status" name="ci-status" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Institute Status -- </option>
+                          <OPTION value="open" style = "color: white;">Open</option>
+                          <OPTION value="closed" style = "color: white;">Closed</option>
+                          <OPTION value="unknown" style = "color: white;">Status Unknown</option>
+                      </SELECT>
+                      <hr>
+                      <label>Demographics</label> 
+                      <p>
+                        <SELECT type="text" id="wealthy" name="wealthy" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Wealth Status -- </option>
+                          <OPTION value="wealthy" style = "color: white;">Wealthy</option>
+                          <OPTION value="notwealthy" style = "color: white;">Not-Wealthy</option>
+                        </SELECT>
+                      </p>
+                      <p>
+                        <SELECT type="text" id="religon" name="religion" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Wealth Status -- </option>
+                          {% for rel in ["religion1", "religion2"] %}
+                          <OPTION value="{rel}" style = "color: white;">{{rel}}</option>
+                          {% endfor %} 
+                        </SELECT>
+                      </p>
+                      
+                  </div>
+                  <br>
+                  <button type="submit" class="btn btn-default bg-dark">Go</button>
+              </form> 
+              </div>
+            </li>
+          </ul>
         </div>
         <a href = https://ncsu-las.org target="_blank"><img src="../static/img/LAS_logo_fullcolor.png" alt="LAS Logo" style="max-height: 72px; align-content: left;"></a>
       </nav>
@@ -69,8 +132,8 @@
       <div class="box content" id="official_map">
         <!-- use MAP to program visual map application for dashboard use -->
         {% block map %} {% endblock %}
-        <div class="button dark">
-          <button>psadflk</button>
+        <div class="queryButton">
+          <button type="button">Click Me!</button>
         </div>
       </div>
       <div class="box timebar bg-dark">

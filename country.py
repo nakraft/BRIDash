@@ -15,8 +15,6 @@ import temp_graph
 
 import gauge
 import HomeButton
-import query
-
 
 '''
 Builds a map with all the data combined for this country of interest
@@ -81,7 +79,6 @@ def build_layers(df, timerange):
     folium.LayerControl(collapsed=True).add_to(map)
     # [min(date_range_f[0], date_range_p[0]), max(date_range_f[1], date_range_p[1])]
     map.add_child(HomeButton.HomeButton(bounds))
-    map.add_child(query.Query())
 
     return maps.html_json(map)
 

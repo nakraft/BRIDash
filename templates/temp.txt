@@ -1,0 +1,13 @@
+// <script src='../static/js/interact.js'></script>
+// <script>
+//     let newDiv = document.createElement("div");
+//     let but = document.createElement("button");
+//     newDiv.className = "leaflet-control";
+//     newDiv.id = "queryMenuContent";
+//     but.id = "openInteract";
+//     newDiv.appendChild(but);
+//     console.log(newDiv);
+//     let object = document.getElementsByClassName("leaflet-bottom leaflet-left")[0];
+//     console.log(object);
+//     object.appendChild(newDiv);
+// </script> 
