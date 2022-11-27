@@ -64,7 +64,7 @@
               Query
               </a>
               <div class="dropdown-menu bg-secondary" aria-labelledby="navbarDropdownMenuLink" >
-                <form method="POST" action="/filter_data" style="margin-left:15px; margin-right:15px; margin-bottom: 15px;">
+                <div style="margin-left:15px; margin-right:15px; margin-bottom: 15px;">
                   <div style = "color: white;">
                       <h3>Query Your Data:</h3>
                       <hr>
@@ -76,7 +76,7 @@
                         <SELECT type="text" id="expenditure-type" name="expenditure-type" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Sector Name -- </option>
                           {% for ele in ["EDUCATION", "COMMUNICATIONS"] %}
-                          <OPTION value="{ele}" style = "color: white;">{{ele}}</option>
+                          <OPTION value="{{ele}}" style = "color: white;">{{ele}}</option>
                           {% endfor %} 
                         </SELECT>
                       </p>
@@ -84,7 +84,7 @@
                         <SELECT type="text" id="donor" name="donors" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Donor Agency -- </option>
                           {% for ele in ["donor1", "donor2"] %}
-                          <OPTION value="{ele}" style = "color: white;">{{ele}}</option>
+                          <OPTION value="{{ele}}" style = "color: white;">{{ele}}</option>
                           {% endfor %} 
                         </SELECT>
                       </p>
@@ -92,9 +92,8 @@
                       <label>Confucius Institutes</label> 
                       <SELECT type="text" id="ci-status" name="ci-status" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Institute Status -- </option>
-                          <OPTION value="open" style = "color: white;">Open</option>
-                          <OPTION value="closed" style = "color: white;">Closed</option>
-                          <OPTION value="unknown" style = "color: white;">Status Unknown</option>
+                          <OPTION value="Open" style = "color: white;">Open</option>
+                          <OPTION value="Closed" style = "color: white;">Closed</option>
                       </SELECT>
                       <hr>
                       <label>Demographics</label> 
@@ -102,22 +101,21 @@
                         <SELECT type="text" id="wealthy" name="wealthy" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Wealth Status -- </option>
                           <OPTION value="wealthy" style = "color: white;">Wealthy</option>
-                          <OPTION value="notwealthy" style = "color: white;">Not-Wealthy</option>
+                          <OPTION value="notwealthy" style = "color: white;">Below Standard Wealth</option>
                         </SELECT>
                       </p>
                       <p>
-                        <SELECT type="text" id="religon" name="religion" class='bg-secondary' style = "color: white;">
-                          <option disabled selected value> -- Wealth Status -- </option>
-                          {% for rel in ["religion1", "religion2"] %}
-                          <OPTION value="{rel}" style = "color: white;">{{rel}}</option>
+                        <SELECT type="text" id="religion" name="religion" class='bg-secondary' style = "color: white;">
+                          <option disabled selected value> -- Religious Status -- </option>
+                          {% for rel in country_details.religion %}
+                          <OPTION value="{{rel}}" style = "color: white;">{{rel}}</option>
                           {% endfor %} 
                         </SELECT>
                       </p>
-                      
                   </div>
                   <br>
-                  <button type="submit" class="btn btn-default bg-dark">Go</button>
-              </form> 
+                  <button type="submit" class="btn btn-default bg-dark" onclick="filter()">Go</button>
+                </div> 
               </div>
             </li>
           </ul>

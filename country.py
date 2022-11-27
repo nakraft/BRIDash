@@ -22,7 +22,7 @@ Parameters:
 df: geodataframe of country of interest
 Return: html rendering of map
 '''
-def build_layers(df, timerange): 
+def build_layers(df, timerange, details): 
 
     country = df['country'].item()
     print("working on " + country)
@@ -56,11 +56,14 @@ def build_layers(df, timerange):
     ).add_to(geo_j)
     outline.add_child(geo_j)
     outline.add_to(map)
-
+    print(details)
     # plot different data layers
     # make sure these are limited by year 
     try: 
-        map = plot_institutes(df['country_id'][0], map, timerange)  
+        if details != None: 
+            map = plot_institutes(df['country_id'][0], map, timerange, details['ci_status'])  
+        else: 
+            map = plot_institutes(df['country_id'][0], map, timerange, None)  
     except Exception:
         print("No data recieved for confucius institutes. Plot a different value.") 
 
@@ -70,8 +73,14 @@ def build_layers(df, timerange):
         print("No data recieved for expenditures. Plot a different value.") 
 
     try: 
-        map = plot_public_opinions(df['country_id'][0], map, timerange)
-    except Exception: 
+        if details != None: 
+            print('asldkjflasdjf', details['religion'])
+            map = plot_public_opinions(df['country_id'][0], map, timerange, {'wealthy' : details['wealthy'], 'religion' : details['religion']})
+        else: 
+            map = plot_public_opinions(df['country_id'][0], map, timerange, {'wealthy' : '', 'religion' : ''}) 
+
+    except Exception as err: 
+        print(err)
         print("No data recieved for public opinions. Plot a different value.") 
 
     # map = plot_immigration(country)
@@ -247,9 +256,9 @@ def get_finance_country(country_id, timerange):
 
     # Aggregate country level finances here 
 
-def plot_institutes(country_id, map, timerange): 
-
-    df = db.get_institutes_data(country_id, timerange[0], timerange[1])
+def plot_institutes(country_id, map, timerange, status): 
+    print('institues')
+    df = db.get_institutes_data(str(country_id), timerange[0], timerange[1], status)
     print("Country #" + str(country_id) + " institutes being loaded.")
     # df = df[df['date_est'] >= timerange(0) & df['date_est'] <= timerange[1]]
 
@@ -301,11 +310,10 @@ def plot_institutes(country_id, map, timerange):
 
     return map 
 
-def plot_public_opinions(country_id, map, timerange): 
+def plot_public_opinions(country_id, map, timerange, details): 
 
-    print(timerange)
-    df = db.get_public_opinion(country_id, timerange[0], timerange[1])
-    print(df)
+    df = db.get_public_opinion(country_id, timerange[0], timerange[1], details)
+
     if len(df) == 0: 
         raise Exception
 
@@ -414,3 +422,7 @@ def plot_public_opinions(country_id, map, timerange):
     #TODO: shift base layer to the last layer and combine statistics there about all datasets 
 
     return map
+
+def get_religion_details(country): 
+
+    return db.get_religion_details(country)

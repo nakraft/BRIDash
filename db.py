@@ -58,16 +58,29 @@ def get_world_data(table, choro_var, aggregate):
 
     return countries
 
-def get_public_opinion(country_id, start_time, end_time): 
+def get_public_opinion(country_id, start_time, end_time, details): 
 
-    conn = get_db_connection_to_df()
-    
-    regions = pd.read_sql(
-                f''' SELECT r.geometry, r.shape_name, ROUND(AVG(us_econ_power) * 100, 2) AS us_econ_power, ROUND(AVG(china_econ_power) * 100, 2) AS china_econ_power, 
+    statement = f''' SELECT r.geometry, r.shape_name, ROUND(AVG(pew.us_econ_power) * 100, 2) AS us_econ_power, ROUND(AVG(china_econ_power) * 100, 2) AS china_econ_power, 
                 ROUND(AVG(fav_china), 2) as fav_china
                 FROM adm as r INNER JOIN pew ON (r.shape_name = pew.adm1) AND (r.country_id = pew.country_id)
                 WHERE r.country_id = \'{country_id}\' AND pew.survey_year >= {start_time}
-                AND pew.survey_year <= {end_time} AND fav_china < 8 GROUP BY r.geometry, r.shape_name;''', conn)
+                AND pew.survey_year <= {end_time} AND pew.fav_china < 8'''
+    
+    if details['wealthy'] != '': 
+        if details['wealthy'] == 'wealthy': 
+            statement = statement + " AND (pew.wealthy IS NULL OR pew.wealthy SIMILAR TO \'%%More%%|%%more%%|%%above%%\')"
+        else: 
+            statement = statement + " AND (pew.wealthy IS NULL OR pew.wealthy SIMILAR TO \'%%less%%|%%Less%%\')"
+
+    if details['religion'] != '':
+        statement = statement + f" AND pew.religious_affiliation = \'{details['religion']}\'"
+
+    conn = get_db_connection_to_df()
+
+    statement = statement + " GROUP BY r.geometry, r.shape_name"
+    print(statement)
+    regions = pd.read_sql(statement, conn)
+    print(regions.shape)
 
     regions = turn_geo(regions)
 
@@ -127,7 +140,7 @@ Data is stored as coordinates and does not need to be converted to geometry's be
 Input: country_id to get institutes within
 Return: CI dataframe
 '''
-def get_institutes_data(country_id, start_time, end_time): 
+def get_institutes_data(country_id, start_time, end_time, status): 
 
     conn = get_db_connection_to_df()
     df = pd.read_sql(
@@ -140,6 +153,9 @@ def get_institutes_data(country_id, start_time, end_time):
         AND cities.id = institutes.gl3_id AND CAST(date_est AS DATE) >= \'''' + str(start_time) + '''-01-01\' 
         AND CAST(date_est AS DATE) <= \'''' + str(end_time) + '''-12-31\';
         ''', conn) 
+    
+    if df.shape[0] > 0 and status != None: 
+        df = df[df['status'] == status]
 
     if df.shape[0] > 0: 
         print(str(df.shape[0]) + " institutes retreived from database")
@@ -225,6 +241,17 @@ def get_dollar_expend(country_id, start_time, end_time):
 
     return round(val, 2)
 
+def get_religion_details(country): 
+    print('get reliigion')
+    conn = get_db_connection_to_df() 
+    l = conn.execute(text(f'''SELECT DISTINCT(religious_affiliation) FROM pew WHERE religious_affiliation IS NOT Null AND country_id = \'{country}\''''))
+
+    religion_list = []
+    for row in l: 
+        religion_list.append(row[0])
+    conn.close() 
+
+    return religion_list
 '''
 Convert Polygon or Multipolygon objects back to their geometry. Point data 
 has all been stored as coordinates, and needs to be converted seperately. 
@@ -242,3 +269,4 @@ def turn_geo(df):
     df['geometry'] = df['geometry'].simplify(.05)
 
     return df
+

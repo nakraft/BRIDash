@@ -19,6 +19,7 @@
             data: JSON.stringify({
                 "start": start_time,
                 "end": end_time,
+                "status": 'timeline'
             }),
             contentType: 'application/json', 
             success: function(result, textStatus, jqXHR) {
@@ -28,6 +29,34 @@
             },
         });
     }
+
+    function filter(){
+        var start_time = $("#flat-slider").slider("values")[0];
+        var end_time = $("#flat-slider").slider("values")[1];
+
+        $.ajax({
+            url: "/data/" + window.location.href.split('data/')[1],
+            type: 'POST',
+            data: JSON.stringify({
+                "start": start_time,
+                "end": end_time,
+                "status": 'query',
+                "keyword_search": document.getElementById('search-term').value, 
+                "expenditure_type": document.getElementById('expenditure-type').value, 
+                "donor_name": document.getElementById('donor').value, 
+                "ci_status": document.getElementById('ci-status').value, 
+                "wealthy": document.getElementById('wealthy').value, 
+                "religion": document.getElementById('religion').value
+            }),
+            contentType: 'application/json', 
+            success: function(result, textStatus, jqXHR) {
+                console.log("Details loading for new filter");
+                document.write(result);
+                document.close();
+            },
+        });
+    }
+
 </script>
 <script>
     function cb(selection){
@@ -66,6 +95,9 @@
         starting_values : [{{ timeline_start[0]}} , {{timeline_start[1]}}],
         labels : {{timeline}}
     };
+
+    // document.getElementById("start-timeline").setAttribute("value", {{timeline_start[0]}}); 
+    // document.getElementById("end-timeline").setAttribute("value", {{timeline_start[1]}}); 
     
 </script>
 <script src='../static/js/button.js'></script>

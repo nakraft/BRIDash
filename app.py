@@ -38,7 +38,7 @@ def world_comparison():
     }
     map_div, hdr_txt, script_txt = choro.build_choropleth(df, choro_var, 'world')
 
-    return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var, 'timeline': labels[table]}) #known bug here, page reloads after map updated causing dropdowns to be reset
+    return render_template('world.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, data={'table':table, 'choro_var':choro_var, 'timeline': labels[table]}, country_details={'country_id': 'None', 'religion' : 'None'}) #known bug here, page reloads after map updated causing dropdowns to be reset
 
 @app.route('/aboutus')
 def about_us():
@@ -51,8 +51,6 @@ def find_country():
     long = None
     results = None
 
-    # TODO: is this if statement needed? 
-    # if request.method == 'POST': 
     print("location change request ")
     df = db.get_world_data(None, None, None)
     if request.json['type'] == 'point':
@@ -75,25 +73,45 @@ def find_country():
 
     return jsonify(results)    
 
-@app.route('/data/<country>', methods=['GET', 'POST'])
-def data(country): 
+# @app.route('/data/<country>', methods=['GET', 'POST'])
+# def data(country): 
+#     if request.method == 'POST': 
+#         return get_country_page(country, None, {'start':request.json['start'], 'end':request.json['end']}) 
+#     else: 
+#         return get_country_page(country, None, None) 
 
+# @app.route('/filter_country', methods=['GET', 'POST'])
+# def filter_country():
+#     try:
+#         return get_country_page(str(request.form.get('country')), ['lskdjf', 'skljdf'], {'start':request.json['start'], 'end':request.json['end']}) 
+#     except: 
+#         return get_country_page(str(request.form.get('country')), ['lskdjf', 'skljdf'], None) 
+
+@app.route('/data/<country>', methods=['GET', 'POST'])
+def get_country_page(country): 
+    
     print("More details requested for country #" + country)
     min_range, max_range = db.get_country_timeline(country)
-    # to use if pulling different data of time from backend (PEW only - i)
-    # if request.method == 'POST' : 
-    #     year_start, year_end = request.args.get('filter')
 
     # geodataframe returned of world data aggregated by country
     df = db.get_country(country)
-    if request.method == 'POST' : 
+    if request.method == 'POST': 
+
         start_range, end_range = request.json['start'], request.json['end']
+        if request.json['status'] == 'query': 
+            details = {'keyword_search': request.json['keyword_search'], 'expenditure_type': request.json['expenditure_type'], 'donor_name' : request.json['donor_name'], 'ci_status' : request.json['ci_status'], 'wealthy' : request.json['wealthy'], 'religion' : request.json['religion'] }
+            print(details)
+        else: 
+            details = None
+
         print("New date range selected", start_range, end_range)
+
     else : 
         start_range, end_range = min_range, max_range
+        details = None
 
     # map will contain inner country details (confucious institutes, expenditures, regional data)
-    map_det = c_maps.build_layers(df, [start_range, end_range])
+    map_det = c_maps.build_layers(df, [start_range, end_range], details)
     map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
     graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend', [2000, 2024])
@@ -102,13 +120,14 @@ def data(country):
 
     expend_titles = c_maps.get_finance_country(country, [start_range, end_range])
     # details needed for sidebar to display data chart 
-    country_details = df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']]
+    country_details = dict(df.iloc[0][['country_id', 'country', 'bri_partner', 'ldc', 'landlocked_dc']])
+    print(country_details)
+    country_details.update({'religion': c_maps.get_religion_details(country)})
 
-    # if request.method == 'POST': 
-    #     return jsonify({'map_div': map_div, 'hdr_txt':hdr_txt, 'script_txt': script_txt, 'expend_titles' : expend_titles}) # put this into a json and return one obejct
-
+    print(country_details)
     return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
      graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(min_range, max_range + 1)), timeline_start = [start_range, end_range])
+
 
 @app.route('/load_graph', methods=['GET', 'POST'])
 def load_graph(): 
