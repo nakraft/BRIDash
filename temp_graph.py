@@ -5,7 +5,7 @@ import json
 
 import db
 
-def build_graph(country_id, table, timerange): 
+def build_graph(country_id, table, timerange, expenditure_type, donor_name, keyword_search): 
 
     layout = go.Layout(
         paper_bgcolor='#555',
@@ -40,7 +40,7 @@ def build_graph(country_id, table, timerange):
     elif table == 'expend': 
 
         print("Getting expenditure data")
-        df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
+        df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1], expenditure_type, donor_name, keyword_search)
         df['color'] = df['sector_name'].map( {'EDUCATION' : '#AF1D1D', 
                             'TRANSPORT AND STORAGE' : '#FBD61D', 
                             'ENERGY' : '#1E9912', 

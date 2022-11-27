@@ -58,6 +58,12 @@ def get_world_data(table, choro_var, aggregate):
 
     return countries
 
+'''
+Collects all public opinion data regarding a particular country. 
+Input: country_id to use in aggregating sources, timeline and details to use in restricting opinions. 
+Return: GeoDataFrame containing 1 record for a region with aggregated attributes 
+    across datasets pertaining to each region in a unique country. 
+'''
 def get_public_opinion(country_id, start_time, end_time, details): 
 
     statement = f''' SELECT r.geometry, r.shape_name, ROUND(AVG(pew.us_econ_power) * 100, 2) AS us_econ_power, ROUND(AVG(china_econ_power) * 100, 2) AS china_econ_power, 
@@ -195,7 +201,7 @@ Input: country_id to get institutes within,
        level to express which (city/region/country) level the data has been stored at
 Return: Immigration dataframe
 '''
-def get_expend_data(country_id, level, start_time, end_time): 
+def get_expend_data(country_id, level, start_time, end_time, expenditure_type, donor_name, keyword_search): 
 
     conn = get_db_connection_to_df()
     # build SQL statement 
@@ -213,7 +219,18 @@ def get_expend_data(country_id, level, start_time, end_time):
     }
 
     sql = 'SELECT * FROM investments AS I ' + innersql[level] + 'WHERE I.country_id = \'' +  str(country_id) + '''\'
-    AND commitment_year >= ''' + str(start_time) + ''' AND completion_year <= ''' + str(end_time)
+    AND commitment_year >= ''' + str(start_time) + ' AND completion_year <= ' + str(end_time)
+    
+    if expenditure_type != None and expenditure_type != '': 
+        sql = sql + ' AND I.sector_name = \'' + expenditure_type + '\''
+    
+    if donor_name != None and donor_name != '': 
+        sql = sql + ' AND I.funding_agencies = \'' + donor_name + '\''
+
+    if keyword_search != None: 
+        sql = sql + f" AND (I.title LIKE \'%%{keyword_search}%%\' OR I.description LIKE \'%%{keyword_search}%%\')"
+
+
     df = pd.read_sql(sql, conn) 
     print(str(len(df)), level, "records collected")
 
@@ -241,8 +258,13 @@ def get_dollar_expend(country_id, start_time, end_time):
 
     return round(val, 2)
 
+'''
+Esablishing the types of religions available for this particular country
+Input: country id 
+Return: listing of religions of people that this country has surveyed. 
+'''
 def get_religion_details(country): 
-    print('get reliigion')
+
     conn = get_db_connection_to_df() 
     l = conn.execute(text(f'''SELECT DISTINCT(religious_affiliation) FROM pew WHERE religious_affiliation IS NOT Null AND country_id = \'{country}\''''))
 
@@ -252,6 +274,30 @@ def get_religion_details(country):
     conn.close() 
 
     return religion_list
+
+'''
+Determining the donors and sectors from a particular countries investments. 
+Input: country id 
+Return: listing of donors and sectors of funded projects that this country has hosted. 
+'''
+def get_finance_details(country): 
+
+    conn = get_db_connection_to_df() 
+    l = conn.execute(text(f'''SELECT DISTINCT(funding_agencies) FROM investments WHERE funding_agencies IS NOT Null AND country_id = \'{country}\''''))
+    s = conn.execute(text(f'''SELECT DISTINCT(sector_name) FROM investments WHERE sector_name IS NOT Null AND country_id = \'{country}\''''))
+
+    donor_list = []
+    for row in l: 
+        donor_list.append(row[0])
+
+    sector_list = []
+    for row in s: 
+        sector_list.append(row[0])
+
+    conn.close() 
+
+    return donor_list, sector_list
+
 '''
 Convert Polygon or Multipolygon objects back to their geometry. Point data 
 has all been stored as coordinates, and needs to be converted seperately. 

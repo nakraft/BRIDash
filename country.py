@@ -68,7 +68,10 @@ def build_layers(df, timerange, details):
         print("No data recieved for confucius institutes. Plot a different value.") 
 
     try: 
-        map = plot_finance(df['country_id'][0], map, timerange)
+        if details != None: 
+            map = plot_finance(df['country_id'][0], map, timerange, details['expenditure_type'], details['sector_name'], details['keyword_search'])
+        else: 
+            map = plot_finance(df['country_id'][0], map, timerange, None, None, None)
     except Exception:
         print("No data recieved for expenditures. Plot a different value.") 
 
@@ -91,12 +94,12 @@ def build_layers(df, timerange, details):
 
     return maps.html_json(map)
 
-def build_graphs(country_id, type, timerange): 
+def build_graphs(country_id, type, timerange, expenditure_type, donor_name, keyword_search): 
     
-    graph = temp_graph.build_graph(country_id, type, timerange)
+    graph = temp_graph.build_graph(country_id, type, timerange, expenditure_type, donor_name, keyword_search)
     return graph
 
-def plot_finance(country_id, map, timerange): 
+def plot_finance(country_id, map, timerange, expenditure_type, donor_name, keyword_search): 
 
     print("Timerange is: ", timerange[0] != None, timerange[1] != None)
 
@@ -104,7 +107,7 @@ def plot_finance(country_id, map, timerange):
 
     # plotting finance is split into two goals 
     # PART 1: point locations of expenditures 
-    df = db.get_expend_data(country_id, 'city', timerange[0], timerange[1])
+    df = db.get_expend_data(country_id, 'city', timerange[0], timerange[1], expenditure_type, donor_name, keyword_search)
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
     if timerange[0] != None and timerange[1] != None: 
         df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() # & df['commitment_year'] >= timerange[0])
@@ -164,7 +167,7 @@ def plot_finance(country_id, map, timerange):
     market_cluster_expend.add_to(expend)
 
     # PART 2: regional locations of expenditures 
-    df_r = db.get_expend_data(country_id, 'region', timerange[0], timerange[1])
+    df_r = db.get_expend_data(country_id, 'region', timerange[0], timerange[1], expenditure_type, donor_name)
     if timerange[0] != None and timerange[1] != None: 
         df_r = df_r.loc[(df_r['commitment_year'] == None) | ((df_r['commitment_year'] <= timerange[1]) & (df_r['commitment_year'] >= timerange[0]))].reset_index()
         print(df_r.shape)
@@ -237,9 +240,9 @@ def plot_finance(country_id, map, timerange):
 
     return map
 
-def get_finance_country(country_id, timerange): 
+def get_finance_country(country_id, timerange, expenditure_type, donor_name, keyword_search): 
 
-    df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1])
+    df = db.get_expend_data(country_id, 'all', timerange[0], timerange[1], expenditure_type, donor_name, keyword_search)
     df = df.loc[(pd.isna(df['gl3_id'])) & (pd.isna(df['gl2_id']))].reset_index()
 
     expenditure_key = {
@@ -426,3 +429,7 @@ def plot_public_opinions(country_id, map, timerange, details):
 def get_religion_details(country): 
 
     return db.get_religion_details(country)
+
+def get_finance_details(country): 
+
+    return db.get_finance_details(country)

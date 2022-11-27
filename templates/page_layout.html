@@ -64,7 +64,7 @@
               Query
               </a>
               <div class="dropdown-menu bg-secondary" aria-labelledby="navbarDropdownMenuLink" >
-                <div style="margin-left:15px; margin-right:15px; margin-bottom: 15px;">
+                <div style="margin-left:15px; margin-right:15px; margin-bottom: 15px; overflow: auto;">
                   <div style = "color: white;">
                       <h3>Query Your Data:</h3>
                       <hr>
@@ -75,7 +75,7 @@
                       <p>
                         <SELECT type="text" id="expenditure-type" name="expenditure-type" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Sector Name -- </option>
-                          {% for ele in ["EDUCATION", "COMMUNICATIONS"] %}
+                          {% for ele in country_details.sectors %}
                           <OPTION value="{{ele}}" style = "color: white;">{{ele}}</option>
                           {% endfor %} 
                         </SELECT>
@@ -83,7 +83,7 @@
                       <p>
                         <SELECT type="text" id="donor" name="donors" class='bg-secondary' style = "color: white;">
                           <option disabled selected value> -- Donor Agency -- </option>
-                          {% for ele in ["donor1", "donor2"] %}
+                          {% for ele in country_details.donor %}
                           <OPTION value="{{ele}}" style = "color: white;">{{ele}}</option>
                           {% endfor %} 
                         </SELECT>
