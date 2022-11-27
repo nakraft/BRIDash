@@ -227,10 +227,10 @@ def get_expend_data(country_id, level, start_time, end_time, expenditure_type, d
     if donor_name != None and donor_name != '': 
         sql = sql + ' AND I.funding_agencies = \'' + donor_name + '\''
 
-    if keyword_search != None: 
+    if keyword_search != None and keyword_search != '': 
         sql = sql + f" AND (I.title LIKE \'%%{keyword_search}%%\' OR I.description LIKE \'%%{keyword_search}%%\')"
 
-
+    print(sql)
     df = pd.read_sql(sql, conn) 
     print(str(len(df)), level, "records collected")
 

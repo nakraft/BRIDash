@@ -60,7 +60,7 @@ def build_layers(df, timerange, details):
     # plot different data layers
     # make sure these are limited by year 
     try: 
-        if details != None: 
+        if details != None and details['ci_status'] != '': 
             map = plot_institutes(df['country_id'][0], map, timerange, details['ci_status'])  
         else: 
             map = plot_institutes(df['country_id'][0], map, timerange, None)  
@@ -69,7 +69,7 @@ def build_layers(df, timerange, details):
 
     try: 
         if details != None: 
-            map = plot_finance(df['country_id'][0], map, timerange, details['expenditure_type'], details['sector_name'], details['keyword_search'])
+            map = plot_finance(df['country_id'][0], map, timerange, details['expenditure_type'], details['donor_name'], details['keyword_search'])
         else: 
             map = plot_finance(df['country_id'][0], map, timerange, None, None, None)
     except Exception:
@@ -77,7 +77,6 @@ def build_layers(df, timerange, details):
 
     try: 
         if details != None: 
-            print('asldkjflasdjf', details['religion'])
             map = plot_public_opinions(df['country_id'][0], map, timerange, {'wealthy' : details['wealthy'], 'religion' : details['religion']})
         else: 
             map = plot_public_opinions(df['country_id'][0], map, timerange, {'wealthy' : '', 'religion' : ''}) 
@@ -110,11 +109,11 @@ def plot_finance(country_id, map, timerange, expenditure_type, donor_name, keywo
     df = db.get_expend_data(country_id, 'city', timerange[0], timerange[1], expenditure_type, donor_name, keyword_search)
     date_range = [min(df['commitment_year']), max(df['commitment_year'])]
     if timerange[0] != None and timerange[1] != None: 
-        df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() # & df['commitment_year'] >= timerange[0])
+        df = df.loc[(df['commitment_year'] == None) | ((df['commitment_year'] <= timerange[1]) & (df['commitment_year'] >= timerange[0]))].reset_index() 
 
     print("Country #" + str(country_id) + " financials being loaded. " + str(len(df)) + " records found for cities.")
 
-    df_dict = df.to_dict('records')
+    df_dict = df[['title', 'status', 'sector_name', 'description', 'commitment_year', 'completion_year', 'amount_constant2017']].to_dict('records')
 
     market_cluster_expend = MarkerCluster(name = "Expend") # no known options for tooltip on cluster, but you can change cluster icon with icon_create_function
 
@@ -167,7 +166,7 @@ def plot_finance(country_id, map, timerange, expenditure_type, donor_name, keywo
     market_cluster_expend.add_to(expend)
 
     # PART 2: regional locations of expenditures 
-    df_r = db.get_expend_data(country_id, 'region', timerange[0], timerange[1], expenditure_type, donor_name)
+    df_r = db.get_expend_data(country_id, 'region', timerange[0], timerange[1], expenditure_type, donor_name, keyword_search)
     if timerange[0] != None and timerange[1] != None: 
         df_r = df_r.loc[(df_r['commitment_year'] == None) | ((df_r['commitment_year'] <= timerange[1]) & (df_r['commitment_year'] >= timerange[0]))].reset_index()
         print(df_r.shape)
@@ -260,7 +259,6 @@ def get_finance_country(country_id, timerange, expenditure_type, donor_name, key
     # Aggregate country level finances here 
 
 def plot_institutes(country_id, map, timerange, status): 
-    print('institues')
     df = db.get_institutes_data(str(country_id), timerange[0], timerange[1], status)
     print("Country #" + str(country_id) + " institutes being loaded.")
     # df = df[df['date_est'] >= timerange(0) & df['date_est'] <= timerange[1]]
@@ -269,12 +267,6 @@ def plot_institutes(country_id, map, timerange, status):
 
     confucius_institutes = folium.FeatureGroup(name='Confucius Institutes')
     for loc in range(0, len(df)):
-        # TODO: assign a color marker for the type of volcano, Strato being the most common
-        #assign color based on status
-        # if geo_df.Type[i] == "Stratovolcano":
-        #     type_color = "green"
-        # elif geo_df.Type[i] == "Complex volcano":
-        #     type_color = "blue"
         type_color = "blue"
 
         # generate the popup 

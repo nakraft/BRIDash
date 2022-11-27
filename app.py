@@ -114,8 +114,6 @@ def get_country_page(country):
     map_det = c_maps.build_layers(df, [start_range, end_range], details)
     map_div, hdr_txt, script_txt = map_det[0], map_det[1], map_det[2]
 
-
-
     if details != None: 
         graphJSON = c_maps.build_graphs(df['country_id'].item(), 'expend', [2000, 2024], details['expenditure_type'], details['donor_name'], details['keyword_search'])
         if graphJSON == None: 
@@ -135,9 +133,8 @@ def get_country_page(country):
     finance_details = c_maps.get_finance_details(country)
     country_details.update({'religion': c_maps.get_religion_details(country), 'donor' : finance_details[0], 'sectors' : finance_details[1]})
 
-    print(country_details)
     return render_template('country.html', map_div=map_div, hdr_txt=hdr_txt, script_txt=script_txt, country_details=country_details,
-     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(min_range, max_range + 1)), timeline_start = [start_range, end_range], current_details = details)
+     graphJSON=graphJSON, expend_titles=expend_titles, timeline= list(range(min_range, max_range + 1)), timeline_start = [start_range, end_range])
 
 
 @app.route('/load_graph', methods=['GET', 'POST'])
